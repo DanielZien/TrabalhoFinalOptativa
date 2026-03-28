@@ -1,4 +1,3 @@
-import { API_BASE } from "../config/api";
 
 class UserModel {
     static async autenticar(email, senha) {
