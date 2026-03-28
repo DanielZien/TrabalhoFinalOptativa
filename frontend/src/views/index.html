@@ -12,49 +12,44 @@
     <link rel="stylesheet" href="/src/styles/style.css">
 </head>
 
-<body class="bg-light">
+<body class="bg-white">
 
     <div class="container-fluid">
         <div class="row">
-            <nav class="col-md-2 sidebar p-3">
-                <h4 class="text-white mb-4 text-center mt-2">
-                    <i class="bi bi-calendar2-event text-primary"></i> Event-Flow
-                </h4>
-                <hr class="text-secondary">
-
-                <a href="index.html" class="bg-primary text-white"><i class="bi bi-house-door me-2"></i> Home</a>
+            
+            <nav class="col-md-3 col-lg-2 d-none d-md-block sidebar p-3">
+                <h4 class="mb-4 text-center mt-2 fw-bold text-dark">EventFlow</h4>
+                <a href="index.html" class="bg-light fw-bold"><i class="bi bi-house-door me-2"></i> Home</a>
                 <a href="registro.html"><i class="bi bi-person-plus me-2"></i> Novo Usuário</a>
                 <a href="login.html"><i class="bi bi-box-arrow-in-right me-2"></i> Login</a>
             </nav>
 
-            <main class="col-md-10 p-5">
+            <main class="col-md-9 col-lg-6 mx-auto p-3 p-md-5">
+                
+                <h5 class="text-center mb-3"><strong>Explore</strong> <span class="fw-normal text-muted">os Eventos</span></h5>
 
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h2>Próximos Eventos</h2>
-                    <select class="form-select w-25 shadow-sm">
-                        <option value="">Todas as Categorias</option>
-                        <option value="Tecnologia">Tecnologia</option>
-                        <option value="Padaria">Padaria</option>
-                    </select>
+                <div class="input-group mb-4 shadow-sm" style="border-radius: 20px; overflow: hidden;">
+                    <span class="input-group-text bg-light border-0"><i class="bi bi-search text-muted"></i></span>
+                    <input type="text" class="form-control search-bar bg-light ps-0" placeholder="Pesquise Eventos, Show e etc..">
                 </div>
 
-                <div id="lista-eventos" class="row g-4">
-                    <div class="text-center mt-5">
-                        <div class="spinner-border  text-primary" role="status"></div>
-                        <p class="mt-2 text-muted">Carregando eventos...</p>
+                
+                <hr style="border-top: 2px solid #eee;">
+
+                <div class="map-banner mb-2 d-flex justify-content-center align-items-center shadow-sm">
+                    <button class="btn btn-light map-btn shadow-sm px-4 py-2">
+                        Explore pelo Mapa <i class="bi bi-geo-alt-fill text-secondary"></i>
+                    </button>
+                </div>
+
+                <p class="text-center text-muted small mb-4">Mostrando <strong id="qtd-mostrando text-dark">0</strong> de <strong id="qtd-total text-dark">0</strong> Eventos</p>
+                
+                <div id="lista-eventos" class="row g-4 ">
                     </div>
-                    
-                </div>
 
+            </main>
         </div>
-        </main>
     </div>
-
-    </div>
-
-    
-
-
 
     <script src="/src/models/EventModel.js"></script>
     <script src="/src/controllers/EventController.js"></script>

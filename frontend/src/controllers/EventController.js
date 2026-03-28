@@ -1,32 +1,44 @@
 //Aqui vamos pegar do model e injetar do model no html
 class EventController {
     static async listarEventos() {
-        //Peço os dados em JSON da API
         const eventos = await EventModel.buscarEventos();
         
-        //Pegando a div que vai ficar esses dados
-        const listaHtml = document.getElementById("lista-eventos");
-        listaHtml.innerHTML =  "";
+        const listaHtml = document.getElementById('lista-eventos');
+        listaHtml.innerHTML = ''; 
 
-        //Fazer uma laço pra cada item 
+        // // Atualiza os contadores na tela
+        // document.getElementById('qtd-mostrando').innerText = eventos.length;
+        // document.getElementById('qtd-total').innerText = "45"; // Fixo por enquanto, depois puxamos da API
+
         eventos.forEach(evento => {
-            const card = document.createElement("div");
-            //Tenho que subistituir isso aqui por um class CSS
-            card.style.border = "1px solid #ccc";
-            card.style.padding = "10px";
-            card.style.margin = "10px 0";
-            card.style.borderRadius = "5px";
-
+            const card = document.createElement('div');
+            // Usando as classes do Bootstrap para montar o card
+            card.className = 'col-12 col-md-6 col-lg-4'; 
 
             card.innerHTML = `
-                <h3>${evento.titulo}</h3>
-                <p><strong>Categoria:</strong> ${evento.categoria}</p>
-                <p><strong>Datas:</strong> ${evento.dataInicio} <br> ${evento.dataFim}</p>
-                <p><strong>Local:</strong> ${evento.local}</p>
-                <p><strong>Descricao:</strong> ${evento.descricao}</p>
-                <button onclick="alert('Vai abrir detalhes do evento ${evento.titulo}">Ver Detalhes</button>
+                <div class="card h-100 shadow-sm border-0 rounded-4 overflow-hidden">
+                    <img src="${evento.imagem}" class="card-img-top" alt="Banner do evento" style="height: 180px; object-fit: cover;">
+                    
+                    <div class="card-body p-3 d-flex flex-column justify-content-between">
+                        <div>
+                            <h6 class="card-title fw-bold text-dark text-truncate mb-1">${evento.titulo}</h6>
+                            <span class="text-muted small">${evento.data}</span>
+                            <p class="text-muted small mb-3">${evento.categoria}</p>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between align-items-end mt-2">
+                            <div>
+                                <span class="d-block text-muted small mb-0" style="line-height: 1;">Ingresso</span>
+                                <strong class="text-dark">${evento.preco}</strong>
+                            </div>
+                            <button class="btn btn-custom-blue px-3 py-1" onclick="alert('Detalhes: ${evento.titulo}')">
+                                Mais Detalhes <i class="bi bi-caret-right-fill small"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
             `;
-
+            
             listaHtml.appendChild(card);
         });
     }
@@ -34,4 +46,4 @@ class EventController {
 
 window.onload = () => {
     EventController.listarEventos();
-}
+};
