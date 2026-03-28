@@ -9,25 +9,20 @@ class EventModel {
 
             const dados = await resposta.json();
 
-            // O SEGREDO ESTÁ AQUI: dados.events.map em vez de dados.map
-            return dados.events.map(eventoAPI => {
-                
-                // Formatação do Preço
+            // Mapeia os eventos (igualzinho a gente já fez)
+            const eventosMapeados = dados.events.map(eventoAPI => {
                 let precoFormatado = "Gratuito";
                 if (eventoAPI.preco && eventoAPI.preco > 0) {
                     precoFormatado = `R$ ${eventoAPI.preco.toFixed(2).replace('.', ',')}`;
                 }
 
-                // Formatação da Data (de 2025-11-15T20... para DD/MM/YYYY)
                 const dataFormatada = new Date(eventoAPI.data).toLocaleDateString('pt-BR');
 
-                // Ajuste da Imagem (Trata os caminhos file:// do React Native)
                 let imagemUrl = eventoAPI.imagem ? eventoAPI.imagem.split('|')[0] : ""; 
                 if (imagemUrl.startsWith('file://') || !imagemUrl) {
                     imagemUrl = "https://images.unsplash.com/photo-1540575467063-178a50c2df87?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80";
                 }
 
-                // Limpando o endereço (Tirando a latitude/longitude do final)
                 let localFormatado = eventoAPI.localizacao.split(' | ')[0];
 
                 return {
@@ -40,9 +35,17 @@ class EventModel {
                     imagem: imagemUrl
                 };
             });
+
+            // RETORNA AGORA A LISTA E O TOTAL!
+            return {
+                lista: eventosMapeados,
+                totalGeral: dados.pagination.total
+            };
+
         } catch (erro) {
             console.error("Falha na comunicação com a API: ", erro);
-            return [];
+            // Em caso de erro, retorna tudo zerado
+            return { lista: [], totalGeral: 0 };
         }
     }
 }

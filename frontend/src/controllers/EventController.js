@@ -1,14 +1,18 @@
 //Aqui vamos pegar do model e injetar do model no html
 class EventController {
     static async listarEventos() {
-        const eventos = await EventModel.buscarEventos();
+        const resultadoApi = await EventModel.buscarEventos();
+        
+        // Separamos a lista de eventos e o número total
+        const eventos = resultadoApi.lista;
+        const totalApi = resultadoApi.totalGeral;
         
         const listaHtml = document.getElementById('lista-eventos');
         listaHtml.innerHTML = ''; 
 
-        // // Atualiza os contadores na tela
-        // document.getElementById('qtd-mostrando').innerText = eventos.length;
-        // document.getElementById('qtd-total').innerText = "45"; // Fixo por enquanto, depois puxamos da API
+        // INJETANDO OS NÚMEROS NA TELA:
+        document.getElementById('qtd-mostrando').innerText = eventos.length;
+        document.getElementById('qtd-total').innerText = totalApi;
 
         eventos.forEach(evento => {
             const card = document.createElement('div');
