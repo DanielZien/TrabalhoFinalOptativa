@@ -2,13 +2,13 @@
 class EventController {
     static async listarEventos() {
         const resultadoApi = await EventModel.buscarEventos();
-        
+
         // Separamos a lista de eventos e o número total
         const eventos = resultadoApi.lista;
         const totalApi = resultadoApi.totalGeral;
-        
+
         const listaHtml = document.getElementById('lista-eventos');
-        listaHtml.innerHTML = ''; 
+        listaHtml.innerHTML = '';
 
         // INJETANDO OS NÚMEROS NA TELA:
         document.getElementById('qtd-mostrando').innerText = eventos.length;
@@ -17,7 +17,7 @@ class EventController {
         eventos.forEach(evento => {
             const card = document.createElement('div');
             // Usando as classes do Bootstrap para montar o card
-            card.className = 'col-12 col-md-6 col-lg-4'; 
+            card.className = 'col-12 col-md-6 col-lg-4';
 
             card.innerHTML = `
                 <div class="card h-100 shadow-sm border-0 rounded-4 overflow-hidden">
@@ -35,14 +35,14 @@ class EventController {
                                 <span class="d-block text-muted small mb-0" style="line-height: 1;">Ingresso</span>
                                 <strong class="text-dark">${evento.preco}</strong>
                             </div>
-                            <button class="btn btn-custom-blue px-3 py-1" onclick="alert('Detalhes: ${evento.titulo}')">
-                                Mais Detalhes <i class="bi bi-caret-right-fill small"></i>
+                            <button class="btn btn-custom-blue px-3 py-1" onclick="window.location.href='detalhes.html?id=${evento.id}'">
+                            Mais Detalhes <i class="bi bi-caret-right-fill small"></i>
                             </button>
                         </div>
                     </div>
                 </div>
             `;
-            
+
             listaHtml.appendChild(card);
         });
     }
