@@ -3,11 +3,13 @@ class EventModel {
         try {
             const resposta = await fetch(API_BASE + '/events');
 
+
             if (!resposta.ok) {
                 throw new Error('Mermão deu erro ao buscar eventos da API');
             }
 
             const dados = await resposta.json();
+            console.log(dados)
 
             // Mapeia os eventos (igualzinho a gente já fez)
             const eventosMapeados = dados.events.map(eventoAPI => {
@@ -105,6 +107,34 @@ class EventModel {
         } catch (erro) {
             console.error("Erro ao buscar detalhes do evento:", erro);
             return null;
+        }
+    }
+
+    //Tentando o cadastro 
+    // Adicione dentro de EventModel.js
+    static async criarEvento(payload) {
+        try {
+            // Pega o token salvo no login (ajuste a chave se você usou outro nome no localStorage)
+            const token = localStorage.getItem('token'); 
+
+            const resposta = await fetch(`${API_BASE}/events`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}` // Cadeado do Swagger!
+                },
+                body: JSON.stringify(payload)
+            });
+
+            if (!resposta.ok) {
+                const erroData = await resposta.json();
+                throw new Error(erroData.message || 'Erro ao criar evento na API');
+            }
+
+            return await resposta.json();
+        } catch (erro) {
+            console.error("Erro no POST:", erro);
+            throw erro; 
         }
     }
 }

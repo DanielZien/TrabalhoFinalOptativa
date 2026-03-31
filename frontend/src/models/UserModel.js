@@ -22,8 +22,9 @@ class UserModel {
             const dados = await resposta.json();
 
             //Pegando esse token
-            if (dados.access_token) {
-                localStorage.setItem('token', dados.access_token);
+            if (dados.access_toekn) {
+                localStorage.setItem('token', dados.access_toekn);
+                console.log("Aqui o o token: "+dados.access_toekn);
             }
 
             return { sucesso: true, mensagem: "Login efetuado!"};

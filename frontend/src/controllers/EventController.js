@@ -9,6 +9,8 @@ class EventController {
 
         this.todosEventosAPI = resultadoApi.lista || resultadoApi;
 
+
+        //Renderizando os que já veio
         this.renderizarEventos(this.todosEventosAPI);
 
         const inputPesquisa = document.getElementById('input-pesquisa');
@@ -33,7 +35,9 @@ class EventController {
         listaHtml.innerHTML = ''; //Deixar limpo
 
         //Preciso atualizar o contador de tela( eu tenho que subistituir isso pela paginação o preguiça)
+        const qtdTotal = document.getElementById('qtd-total').innerText = listaParaExibir.totalGeral;
         const qtdMostrando = document.getElementById('qtd-mostrando');
+
         if (qtdMostrando) qtdMostrando.innerText = listaParaExibir.length //If com uma linha apenas
 
         //Se não achar nada
