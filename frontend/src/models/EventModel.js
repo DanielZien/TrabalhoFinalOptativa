@@ -4,6 +4,9 @@ class EventModel {
             const resposta = await fetch(API_BASE + '/events');
 
 
+            const token = localStorage.getItem('token'); 
+            console.log(token);
+
             if (!resposta.ok) {
                 throw new Error('Mermão deu erro ao buscar eventos da API');
             }
@@ -11,7 +14,7 @@ class EventModel {
             const dados = await resposta.json();
             console.log(dados)
 
-            // Mapeia os eventos (igualzinho a gente já fez)
+            // Mapeia os eventos 
             const eventosMapeados = dados.events.map(eventoAPI => {
                 let precoFormatado = "Gratuito";
                 if (eventoAPI.preco && eventoAPI.preco > 0) {
@@ -53,7 +56,7 @@ class EventModel {
 
     static async buscarEventoPorId(id) {
         try {
-            // 1. Drible da vaca: chamamos a rota geral que sabemos que funciona perfeitamente
+            //a rota geral que funciona perfeitamente
             const resposta = await fetch(`${API_BASE}/events`);
             
             if (!resposta.ok) {
@@ -62,28 +65,25 @@ class EventModel {
 
             const dados = await resposta.json();
 
-            // 2. Procuramos o evento específico pelo ID na lista
-            // Usamos == em vez de === porque o id da URL é texto e o da API é número
+  
             const eventoAPI = dados.events.find(evento => evento.id == id);
 
             if (!eventoAPI) {
                 throw new Error('Evento não encontrado na lista');
             }
 
-            // 3. Formatação do Preço
+            //Formatação do Preço
             let precoFormatado = "Gratuito";
             if (eventoAPI.preco && eventoAPI.preco > 0) {
                 precoFormatado = `R$ ${eventoAPI.preco.toFixed(2).replace('.', ',')}`;
             }
 
-            // 4. Formatação da Data e Hora (Usando os campos que você mostrou no JSON)
             const dataObj = new Date(eventoAPI.data);
             const dataFormatada = dataObj.toLocaleDateString('pt-BR');
             
-            // Note que usei a hora_inicio aqui para ficar bem preciso
             const horaFormatada = new Date(eventoAPI.hora_inicio).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
 
-            // 5. Tratando a localização
+            //Tratando a localização
             let localText = eventoAPI.localizacao;
             let latLng = "";
             if (localText && localText.includes('|')) {
@@ -92,7 +92,6 @@ class EventModel {
                 latLng = partes[1].trim(); 
             }
 
-            // 6. Retorna tudo mastigadinho pro Controller
             return {
                 id: eventoAPI.id,
                 titulo: eventoAPI.titulo,
@@ -101,7 +100,8 @@ class EventModel {
                 localizacao: localText,
                 coordenadas: latLng,
                 preco: precoFormatado,
-                organizador: eventoAPI.creator || { nome: "Não informado", email: "-", telefone: "-" }
+                organizador: eventoAPI.creator || { nome: "Não informado", email: "-", telefone: "-" },
+                imagem: eventoAPI.imagem 
             };
 
         } catch (erro) {
@@ -111,17 +111,17 @@ class EventModel {
     }
 
     //Tentando o cadastro 
-    // Adicione dentro de EventModel.js
     static async criarEvento(payload) {
         try {
-            // Pega o token salvo no login (ajuste a chave se você usou outro nome no localStorage)
+            // Pega o token salvo no login
             const token = localStorage.getItem('token'); 
+            console.log(token);
 
             const resposta = await fetch(`${API_BASE}/events`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}` // Cadeado do Swagger!
+                    'Authorization': `Bearer ${token}` 
                 },
                 body: JSON.stringify(payload)
             });

@@ -6,12 +6,12 @@ class LoginController {
 
         // Escuta o evento de 'submit' do formulário
         form.addEventListener('submit', async (evento) => {
-            evento.preventDefault(); // Impede a página de recarregar
+            evento.preventDefault(); // Impede a página de recarregar, achei brabo
 
             const email = document.getElementById('email').value;
             const senha = document.getElementById('senha').value;
 
-            // 1. VALIDAÇÃO BÁSICA (Garante os pontos da Parte 2)
+            //VALIDAÇÃO BÁSICA
             if (!email || !senha) {
                 this.mostrarErro("Por favor, preencha e-mail e senha.");
                 return;
@@ -22,16 +22,15 @@ class LoginController {
                 return;
             }
 
-            // Esconde o erro e muda o botão para "Carregando..."
             msgErro.classList.add('d-none');
             const btnSubmit = form.querySelector('button');
             btnSubmit.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Entrando...';
             btnSubmit.disabled = true;
 
-            // 2. CHAMA O MODEL PARA AUTENTICAR
+            //CHAMA O MODEL PARA AUTENTICAR
             const resposta = await UserModel.autenticar(email, senha);
 
-            // 3. TRATA A RESPOSTA
+            //TRATA A RESPOSTA
             if (resposta.sucesso) {
                 // Se deu certo, redireciona para a Home
                 window.location.href = 'index.html';

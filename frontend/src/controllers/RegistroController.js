@@ -1,15 +1,15 @@
 class RegistroController {
 
     //Variavel pra guardar as imagens
-    static imagensBase64 = []; //Em base64 por questões de não quero pertubar meu amigo com questões minhas.
+    static imagensBase64 = []; //Em base64 por questões de não quero pertubar meu amigo com questões minhas. Tive que fazer minha propria API que Usa A API dele
 
 
     static inicializar() {
-        // 1. Configura a busca do ViaCEP
+        //Configura a busca do ViaCEP
         const campoCep = document.getElementById('reg-cep');
         campoCep.addEventListener('blur', this.buscarCep);
 
-        // 2. Configura o envio do formulário
+        //Configura o envio do formulário
         const form = document.getElementById('form-registro-evento');
         form.addEventListener('submit', this.salvarEvento);
 
@@ -72,47 +72,66 @@ class RegistroController {
     }
 
     static async salvarEvento(evento) {
-        evento.preventDefault(); // Impede a tela de recarregar
-        
+        evento.preventDefault(); 
         const btnSalvar = document.getElementById('btn-salvar');
-        btnSalvar.innerText = "Salvando...";
+        btnSalvar.innerText = "Salvando (Fazendo upload)...";
         btnSalvar.disabled = true;
 
         try {
-            // FORMATANDO A DATA: O input type="date" devolve "YYYY-MM-DD"
-            // A API quer "dd/mm/aaaa hh:mm"
-            const dataInvertida = document.getElementById('reg-data').value; // ex: 2026-05-15
-            
-            const horaInicio = document.getElementById('reg-hora-inicio').value;
-            const dataFormatada = new Date(`${dataInvertida}T${horaInicio}:00`).toISOString();
+    
+            const formData = new FormData();
 
-            // FORMATANDO ENDEREÇO
+            const dataInvertida = document.getElementById('reg-data').value;
+            const horaInicio = document.getElementById('reg-hora-inicio').value;
+            const dataIso8601 = new Date(`${dataInvertida}T${horaInicio}:00`).toISOString();
+
+            // 3. Monta o endereço
             const rua = document.getElementById('reg-rua').value;
             const num = document.getElementById('reg-numero').value;
             const cidade = document.getElementById('reg-cidade').value;
             const uf = document.getElementById('reg-uf').value;
             const localizacaoString = `${rua} ${num}, ${cidade}, ${uf}`;
 
-            const stringImagensFinal = RegistroController.imagensBase64.join('|');
+            // 4. Coloca os textos no FormData
+            formData.append('titulo', document.getElementById('reg-titulo').value);
+            formData.append('descricao', document.getElementById('reg-descricao').value);
+            formData.append('data', dataIso8601);
+            formData.append('localizacao', localizacaoString);
+            formData.append('hora_inicio', horaInicio);
+            formData.append('hora_fim', document.getElementById('reg-hora-fim').value);
+            formData.append('categoria', document.getElementById('reg-categoria').value);
+            formData.append('preco', parseFloat(document.getElementById('reg-preco').value));
 
-            // MONTANDO O PAYLOAD EXATO
-            const payload = {
-                titulo: document.getElementById('reg-titulo').value,
-                descricao: document.getElementById('reg-descricao').value,
-                data: dataFormatada,
-                localizacao: localizacaoString,
-                hora_inicio: horaInicio,
-                hora_fim: document.getElementById('reg-hora-fim').value,
-                categoria: document.getElementById('reg-categoria').value,
-                imagem: stringImagensFinal, // Imagem padrão já que pulamos isso
-                preco: parseFloat(document.getElementById('reg-preco').value)
-            };
+            // 5. Coloca OS ARQUIVOS REAIS no FormData
+            const inputImagens = document.getElementById('reg-imagens');
+            if (inputImagens.files.length > 0) {
+                // Pega no máximo 4 arquivos do input
+                const arquivos = Array.from(inputImagens.files).slice(0, 4);
+                arquivos.forEach(arquivo => {
+                    // O nome 'imagens' tem que ser EXATAMENTE o mesmo do @RequestParam no Java
+                    formData.append('imagens', arquivo); 
+                });
+            }
 
-            // MANDANDO PRO MODEL
-            await EventModel.criarEvento(payload);
+            const token = localStorage.getItem('token') || ''; 
 
-            alert("Evento criado com sucesso!");
-            window.location.href = "index.html"; // Volta pra home para ver o evento novo
+            // 7. Manda a requisição para o nosso Java BFF na porta 8080!
+            const resposta = await fetch('http://localhost:8080/api/bff/eventos', {
+                method: 'POST',
+                headers: {
+                    // Manda o token para o Java repassar pro Node
+                    'Authorization': `Bearer ${token}` 
+                },
+                body: formData
+            });
+
+            if (!resposta.ok) {
+                const erroTxt = await resposta.text();
+                throw new Error(erroTxt);
+            }
+
+            alert("Sucesso! Imagens enviadas pro Cloudinary e Evento salvo!");
+            window.location.href = "index.html"; 
 
         } catch (erro) {
             alert("Erro ao salvar: " + erro.message);
