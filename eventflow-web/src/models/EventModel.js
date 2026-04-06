@@ -1,12 +1,11 @@
 import { API_BASE } from "../config/api";
 
 export const EventModel = {
-     async buscarEventos() {
+     async buscarEventos(pagina) {
         try {
-            const resposta = await fetch(API_BASE + '/events');
-
-
-            const token = localStorage.getItem('token'); 
+            // Adicionamos o ?page= no final da URL
+            const resposta = await fetch(`${API_BASE}/events?page=${pagina}&limit=6`);
+            const token = localStorage.getItem('token');
             console.log(token);
 
             if (!resposta.ok) {
@@ -46,7 +45,9 @@ export const EventModel = {
             // RETORNA AGORA A LISTA E O TOTAL!
             return {
                 lista: eventosMapeados,
-                totalGeral: dados.pagination.total
+                totalGeral: dados.pagination.total,
+                paginaAtual: dados.pagination.page,
+                totalPaginas: dados.pagination.pages
             };
 
         } catch (erro) {

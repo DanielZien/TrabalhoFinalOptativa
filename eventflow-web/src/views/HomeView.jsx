@@ -7,7 +7,10 @@ export default function HomeView({
     totalGeral, 
     carregando, 
     termoPesquisa, 
-    setTermoPesquisa 
+    setTermoPesquisa,
+    paginaAtual,
+    totalPaginas,
+    setPaginaAtual
 }) {
     const navigate = useNavigate();
 
@@ -120,6 +123,43 @@ export default function HomeView({
                             ))
                         )}
                     </div>
+
+                    {/* Controles de Paginação (Só aparecem se tiver mais de 1 página) */}
+                    {!carregando && totalPaginas > 1 && (
+                        <div className="d-flex justify-content-center mt-5">
+                            {/* Controles de Paginação Estilizados */}
+{!carregando && totalPaginas > 1 && (
+    <div className="d-flex justify-content-center align-items-center mt-5 mb-5 gap-3">
+        
+        {/* Botão Anterior */}
+        <button 
+            className="btn btn-outline-primary d-flex align-items-center rounded-pill px-4 py-2 fw-bold transition-all" 
+            onClick={() => setPaginaAtual(paginaAtual - 1)}
+            disabled={paginaAtual === 1}
+            style={{ minWidth: '130px', justifyContent: 'center' }}
+        >
+            <i className="bi bi-chevron-left me-2"></i> Anterior
+        </button>
+        
+        {/* Indicador de Página */}
+        <div className="bg-primary text-white rounded-pill px-4 py-2 fw-bold shadow-sm">
+            {paginaAtual} <span className="fw-normal opacity-75">de</span> {totalPaginas}
+        </div>
+        
+        {/* Botão Próxima */}
+        <button 
+            className="btn btn-outline-primary d-flex align-items-center rounded-pill px-4 py-2 fw-bold transition-all" 
+            onClick={() => setPaginaAtual(paginaAtual + 1)}
+            disabled={paginaAtual === totalPaginas}
+            style={{ minWidth: '130px', justifyContent: 'center' }}
+        >
+            Próxima <i className="bi bi-chevron-right ms-2"></i>
+        </button>
+
+    </div>
+)}
+                        </div>
+                    )}
 
                 </main>
             </div>

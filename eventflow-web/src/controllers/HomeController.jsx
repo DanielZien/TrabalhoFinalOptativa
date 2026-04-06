@@ -1,37 +1,43 @@
-// src/controllers/HomeController.jsx
 import React, { useState, useEffect } from 'react';
 import { EventModel } from '../models/EventModel';
 import HomeView from '../views/HomeView';
 
 export default function HomeController() {
-    // Estados para gerenciar as listas e a pesquisa
-    const [eventosObtidos, setEventosObtidos] = useState([]); // A lista original da API
-    const [eventosExibidos, setEventosExibidos] = useState([]); // A lista que muda com o filtro
+    const [eventosObtidos, setEventosObtidos] = useState([]);
+    const [eventosExibidos, setEventosExibidos] = useState([]);
     const [totalGeral, setTotalGeral] = useState(0);
     const [carregando, setCarregando] = useState(true);
     const [termoPesquisa, setTermoPesquisa] = useState('');
+    
+    // Novos estados de Paginação
+    const [paginaAtual, setPaginaAtual] = useState(1);
+    const [totalPaginas, setTotalPaginas] = useState(1);
 
-    // Busca os dados na API apenas quando a tela abre
+    // O useEffect agora observa a variável 'paginaAtual'
     useEffect(() => {
         async function carregarDados() {
             setCarregando(true);
-            const resultado = await EventModel.buscarEventos();
+            // Passa a página atual para o Model
+            const resultado = await EventModel.buscarEventos(paginaAtual);
             
             if (resultado && resultado.lista) {
                 setEventosObtidos(resultado.lista);
-                setEventosExibidos(resultado.lista); // Começa mostrando todos
+                setEventosExibidos(resultado.lista);
                 setTotalGeral(resultado.totalGeral);
+                
+                // Salva a página atual e o limite que a API devolveu
+                setPaginaAtual(resultado.paginaAtual);
+                setTotalPaginas(resultado.totalPaginas);
             }
             setCarregando(false);
         }
 
         carregarDados();
-    }, []); 
+    }, [paginaAtual]); // <-- Toda vez que a página mudar, a API será chamada novamente
 
-    // Efeito Mágico do React: Roda sozinho toda vez que 'termoPesquisa' mudar
     useEffect(() => {
         if (termoPesquisa === '') {
-            setEventosExibidos(eventosObtidos); // Se limpar a busca, volta tudo
+            setEventosExibidos(eventosObtidos);
         } else {
             const filtrados = eventosObtidos.filter(ev => 
                 ev.titulo.toLowerCase().includes(termoPesquisa.toLowerCase()) 
@@ -47,6 +53,10 @@ export default function HomeController() {
             carregando={carregando} 
             termoPesquisa={termoPesquisa}
             setTermoPesquisa={setTermoPesquisa}
+            // Passamos as propriedades de paginação para a View
+            paginaAtual={paginaAtual}
+            totalPaginas={totalPaginas}
+            setPaginaAtual={setPaginaAtual}
         />
     );
 }
