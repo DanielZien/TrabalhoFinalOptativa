@@ -1,0 +1,58 @@
+.sidebar {
+    min-height: 100vh;
+    background-color: #f8f9fa;
+    border-right: 1px solid #ddd;
+}
+
+.sidebar a {
+    color: #333;
+    text-decoration: none;
+    padding: 12px;
+    display: block;
+    border-radius: 5px;
+    margin-bottom: 5px;
+}
+
+.sidebar a:hover {
+    background-color: #e9ecef;
+}
+
+/* Estilos específicos do seu protótipo */
+.btn-custom-blue {
+    background-color: #0b0080;
+    color: white;
+    border-radius: 20px;
+    font-size: 0.9rem;
+}
+
+.btn-custom-blue:hover {
+    background-color: #080060;
+    color: white;
+}
+
+.search-bar {
+    background-color: #e2e2e2;
+    border-radius: 20px;
+    border: none;
+}
+
+.map-banner {
+    height: 120px;
+    background: url('https://wiki.openstreetmap.org/w/images/thumb/4/44/Standard_Map_Style_rendering.png/600px-Standard_Map_Style_rendering.png') center/cover;
+    border-radius: 10px;
+    position: relative;
+}
+
+.map-btn {
+    border-radius: 20px;
+    font-weight: bold;
+    color: #555;
+}
+
+@media (min-width: 992px) {
+    .content-centered {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+}
+
