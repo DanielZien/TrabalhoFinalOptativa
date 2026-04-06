@@ -2,11 +2,11 @@
 import React from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 
-export default function HomeView({ 
-    eventos, 
-    totalGeral, 
-    carregando, 
-    termoPesquisa, 
+export default function HomeView({
+    eventos,
+    totalGeral,
+    carregando,
+    termoPesquisa,
     setTermoPesquisa,
     paginaAtual,
     totalPaginas,
@@ -23,7 +23,7 @@ export default function HomeView({
     return (
         <div className="container-fluid bg-white" style={{ minHeight: '100vh' }}>
             <div className="row">
-                
+
                 {/* Menu Lateral (Sidebar) */}
                 <nav className="col-md-3 col-lg-2 d-none d-md-block border-end p-3" style={{ minHeight: '100vh' }}>
                     <h4 className="mb-4 text-center mt-2 fw-bold text-dark">EventFlow</h4>
@@ -41,8 +41,8 @@ export default function HomeView({
                 </nav>
 
                 {/* Área Principal */}
-                <main className="col-md-9 col-lg-8 mx-auto p-3 p-md-5">
-                    
+                <main className="col-md-9 col-lg-8 mx-auto p-3 p-md-2">
+
                     <h5 className="text-center mb-3">
                         <strong>Explore</strong> <span className="fw-normal text-muted">os Eventos</span>
                     </h5>
@@ -52,9 +52,9 @@ export default function HomeView({
                         <span className="input-group-text bg-white border-0">
                             <i className="bi bi-search text-muted"></i>
                         </span>
-                        <input 
-                            type="text" 
-                            className="form-control border-0 shadow-none" 
+                        <input
+                            type="text"
+                            className="form-control border-0 shadow-none"
                             placeholder="Pesquise Eventos, Show e etc.."
                             value={termoPesquisa}
                             onChange={(e) => setTermoPesquisa(e.target.value)}
@@ -64,17 +64,17 @@ export default function HomeView({
                     <hr style={{ borderTop: '2px solid #eee' }} />
 
                     {/* Banner do Mapa */}
-                    <div className="map-banner mb-4 d-flex justify-content-center align-items-center bg-light rounded-4 shadow-sm py-3 border">
+                    <div className="map-banner mb-2 d-flex justify-content-center align-items-center bg-light rounded-4 shadow-sm py-3 border">
                         <button className="btn btn-white shadow-sm px-4 py-2 bg-white rounded-pill border fw-semibold">
                             Explore pelo Mapa <i className="bi bi-geo-alt-fill text-danger ms-1"></i>
                         </button>
                     </div>
 
                     {/* Contadores */}
-                    <p className="text-center text-muted small mb-4">
+                    <p className="text-center text-muted small mb-2">
                         Mostrando <strong className="text-dark">{eventos.length}</strong> de <strong className="text-dark">{totalGeral}</strong> Eventos
                     </p>
-                    
+
                     {/* Lista de Cards */}
                     <div className="row g-4">
                         {carregando ? (
@@ -90,27 +90,27 @@ export default function HomeView({
                             eventos.map((evento) => (
                                 <div className="col-12 col-md-6 col-lg-4" key={evento.id}>
                                     <div className="card h-100 shadow-sm border-0 rounded-4 overflow-hidden">
-                                        <img 
-                                            src={evento.imagem} 
-                                            className="card-img-top" 
-                                            alt={evento.titulo} 
-                                            style={{ height: '180px', objectFit: 'cover' }}
+                                        <img
+                                            src={evento.imagem}
+                                            className="card-img-top"
+                                            alt={evento.titulo}
+                                            style={{ height: '140px', objectFit: 'cover' }}
                                         />
-                                        
+
                                         <div className="card-body p-3 d-flex flex-column justify-content-between">
                                             <div>
                                                 <h6 className="card-title fw-bold text-dark text-truncate mb-1">{evento.titulo}</h6>
                                                 <span className="text-muted small d-block">{evento.data}</span>
                                                 <p className="text-muted small mb-3">{evento.categoria}</p>
                                             </div>
-                                            
+
                                             <div className="d-flex justify-content-between align-items-end mt-2">
                                                 <div>
                                                     <span className="d-block text-muted small mb-0" style={{ lineHeight: 1 }}>Ingresso</span>
                                                     <strong className="text-dark">{evento.preco}</strong>
                                                 </div>
-                                                <button 
-                                                    className="btn px-3 py-1 text-white fw-semibold shadow-sm" 
+                                                <button
+                                                    className="btn px-3 py-1 text-white fw-semibold shadow-sm"
                                                     style={{ backgroundColor: '#000080', borderRadius: '8px', fontSize: '0.9rem' }}
                                                     onClick={() => irParaDetalhes(evento)}
                                                 >
@@ -124,40 +124,52 @@ export default function HomeView({
                         )}
                     </div>
 
-                    {/* Controles de Paginação (Só aparecem se tiver mais de 1 página) */}
+                    {/* Controles de Paginação Estilizados com Cor Personalizada */}
                     {!carregando && totalPaginas > 1 && (
-                        <div className="d-flex justify-content-center mt-5">
-                            {/* Controles de Paginação Estilizados */}
-{!carregando && totalPaginas > 1 && (
-    <div className="d-flex justify-content-center align-items-center mt-5 mb-5 gap-3">
-        
-        {/* Botão Anterior */}
-        <button 
-            className="btn btn-outline-primary d-flex align-items-center rounded-pill px-4 py-2 fw-bold transition-all" 
-            onClick={() => setPaginaAtual(paginaAtual - 1)}
-            disabled={paginaAtual === 1}
-            style={{ minWidth: '130px', justifyContent: 'center' }}
-        >
-            <i className="bi bi-chevron-left me-2"></i> Anterior
-        </button>
-        
-        {/* Indicador de Página */}
-        <div className="bg-primary text-white rounded-pill px-4 py-2 fw-bold shadow-sm">
-            {paginaAtual} <span className="fw-normal opacity-75">de</span> {totalPaginas}
-        </div>
-        
-        {/* Botão Próxima */}
-        <button 
-            className="btn btn-outline-primary d-flex align-items-center rounded-pill px-4 py-2 fw-bold transition-all" 
-            onClick={() => setPaginaAtual(paginaAtual + 1)}
-            disabled={paginaAtual === totalPaginas}
-            style={{ minWidth: '130px', justifyContent: 'center' }}
-        >
-            Próxima <i className="bi bi-chevron-right ms-2"></i>
-        </button>
+                        <div className="d-flex justify-content-center align-items-center mt-4 pb-2 gap-3">
 
-    </div>
-)}
+                            {/* Botão Anterior */}
+                            <button
+                                className="btn d-flex align-items-center rounded-pill px-4 py-2 fw-bold transition-all"
+                                onClick={() => setPaginaAtual(paginaAtual - 1)}
+                                disabled={paginaAtual === 1}
+                                style={{
+                                    minWidth: '130px',
+                                    justifyContent: 'center',
+                                    // Se for página 1, deixa cinza. Se não, usa sua cor!
+                                    color: paginaAtual === 1 ? '#6c757d' : '#000080',
+                                    borderColor: paginaAtual === 1 ? '#dee2e6' : '#000080',
+                                    backgroundColor: 'transparent'
+                                }}
+                            >
+                                <i className="bi bi-chevron-left me-2"></i> Anterior
+                            </button>
+
+                            {/* Indicador de Página */}
+                            <div
+                                className="text-white rounded-pill px-4 py-2 fw-bold shadow-sm"
+                                style={{ backgroundColor: '#000080' }}
+                            >
+                                {paginaAtual} <span className="fw-normal opacity-75">de</span> {totalPaginas}
+                            </div>
+
+                            {/* Botão Próxima */}
+                            <button
+                                className="btn d-flex align-items-center rounded-pill px-4 py-2 fw-bold transition-all"
+                                onClick={() => setPaginaAtual(paginaAtual + 1)}
+                                disabled={paginaAtual === totalPaginas}
+                                style={{
+                                    minWidth: '130px',
+                                    justifyContent: 'center',
+                                    // Se for a última página, deixa cinza. Se não, usa sua cor!
+                                    color: paginaAtual === totalPaginas ? '#6c757d' : '#000080',
+                                    borderColor: paginaAtual === totalPaginas ? '#dee2e6' : '#000080',
+                                    backgroundColor: 'transparent'
+                                }}
+                            >
+                                Próxima <i className="bi bi-chevron-right ms-2"></i>
+                            </button>
+
                         </div>
                     )}
 
