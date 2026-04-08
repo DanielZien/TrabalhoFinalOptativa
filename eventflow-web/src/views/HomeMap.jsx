@@ -17,9 +17,9 @@ L.Icon.Default.mergeOptions({
 });
 
 export default function HomeMap({ eventos }) {
-    // Coordenadas padrão inicial: Centro do Brasil ou Curitiba
-    let defaultCenter = [-15.7801, -47.9292]; // Brasil
-    let zoomLevel = 4;
+    // Coordenadas padrão inicial: Rio Branco, Acre
+    let defaultCenter = [-9.97499, -67.8243];
+    let zoomLevel = 13;
 
     if (eventos && eventos.length === 1 && eventos[0].coordenadas && eventos[0].coordenadas.length === 2) {
         defaultCenter = eventos[0].coordenadas;

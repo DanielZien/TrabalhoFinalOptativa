@@ -129,6 +129,18 @@ export const EventModel = {
                 if (coords.length >= 2) {
                     coordenadasArray = [parseFloat(coords[0]), parseFloat(coords[1])];
                 }
+            } else if (localText) {
+                // Fallback: Busca as coordenadas na API Nominatim caso só haja o texto
+                try {
+                    const query = `${localText}, Brazil`;
+                    const resGeo = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=1`);
+                    const dataGeo = await resGeo.json();
+                    if (dataGeo && dataGeo.length > 0) {
+                        coordenadasArray = [parseFloat(dataGeo[0].lat), parseFloat(dataGeo[0].lon)];
+                    }
+                } catch(e) {
+                    console.error("Erro no Geocoding Fallback", e);
+                }
             }
 
             return {
