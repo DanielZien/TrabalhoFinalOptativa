@@ -46,6 +46,20 @@ export default function HomeController() {
         }
     }, [termoPesquisa, eventosObtidos]);
 
+    const habilitarModoAdmin = localStorage.getItem('role')?.toUpperCase() === 'ADMIN';
+
+    const aoDeletarEvento = async (id) => {
+        if (window.confirm("Você tem certeza que deseja excluir esse evento permanentemente?")) {
+            const resposta = await EventModel.excluirEvento(id);
+            if (resposta.sucesso) {
+                alert("Evento excluído com sucesso!");
+                setEventosObtidos(prev => prev.filter(e => e.id !== id));
+            } else {
+                alert(resposta.mensagem);
+            }
+        }
+    };
+
     return (
         <HomeView 
             eventos={eventosExibidos} 
@@ -57,6 +71,10 @@ export default function HomeController() {
             paginaAtual={paginaAtual}
             totalPaginas={totalPaginas}
             setPaginaAtual={setPaginaAtual}
+            
+            // Passamos privilégios e funções Admin
+            habilitarModoAdmin={habilitarModoAdmin}
+            aoDeletarEvento={aoDeletarEvento}
         />
     );
 }

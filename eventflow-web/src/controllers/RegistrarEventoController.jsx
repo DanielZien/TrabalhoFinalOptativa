@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import RegistroView from '../views/RegistroView'; // Ajuste o caminho se necessário
-import { useNavigate } from 'react-router-dom';
+import RegistroView from '../views/RegistroView';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { EventModel } from '../models/EventModel';
 
 export default function RegistrarEventoController() {
     // 1. Estados do Formulário
@@ -28,6 +29,36 @@ export default function RegistrarEventoController() {
     const [coordenadas, setCoordenadas] = useState(null);
 
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
+    const editId = searchParams.get('edit');
+
+    // Se estiver no Modo Edição, carrega os dados atuais
+    React.useEffect(() => {
+        if (editId) {
+            async function carregar() {
+                const ev = await EventModel.buscarEventoPorId(editId);
+                if (ev) {
+                    setTitulo(ev.titulo);
+                    if (ev.categoria) setCategoria(ev.categoria);
+                    if (ev.descricao && ev.descricao !== "Sem descrição disponível.") setDescricao(ev.descricao);
+                    if (ev.preco && ev.preco !== 'Gratuito') setPreco(ev.preco.replace('R$ ', '').replace(',', '.'));
+                    
+                    if (ev.dataBruta) {
+                        try { setData(new Date(ev.dataBruta).toISOString().split('T')[0]); } catch(e){}
+                    }
+                    if (ev.horaInicioBruta) {
+                        try { setHoraInicio(new Date(ev.horaInicioBruta).toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'})); } catch(e){}
+                    }
+                    if (ev.horaFimBruta) {
+                        try { setHoraFim(new Date(ev.horaFimBruta).toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'})); } catch(e){}
+                    }
+                    if (ev.localizacao) setRua(ev.localizacao);
+                    if (ev.coordenadas) setCoordenadas(ev.coordenadas);
+                }
+            }
+            carregar();
+        }
+    }, [editId]);
 
     // 2. Lógica do ViaCEP
     const buscarCep = async () => {
@@ -76,15 +107,46 @@ export default function RegistrarEventoController() {
         setSalvando(true);
 
         try {
-            const formData = new FormData();
             const dataIso8601 = new Date(`${data}T${horaInicio}:00`).toISOString();
             
-            // Formatando endereço e concatenando coordenadas separadas por `|` para que eventModel consuma
-            let localizacaoString = `${rua} ${numero}, ${bairro}, ${cidade}, ${uf}`;
+            // Formatando endereço completo com coordenadas
+            let localizacaoString = '';
+            if (cep || numero) {
+                localizacaoString = `${rua} ${numero}, ${bairro}, ${cidade}, ${uf}`;
+            } else {
+                localizacaoString = rua; // Fallback se tiver editando e não colocou CEP de novo
+            }
+
             if (coordenadas) {
                 localizacaoString += ` | ${coordenadas[0]},${coordenadas[1]}`;
             }
 
+            // Modo Edição (PATCH Pura via API NODE)
+            if (editId) {
+                let payload = {
+                    titulo,
+                    descricao,
+                    data: dataIso8601,
+                    localizacao: localizacaoString,
+                    hora_inicio: new Date(`${data}T${horaInicio}:00`).toISOString(),
+                    hora_fim: new Date(`${data}T${horaFim}:00`).toISOString(),
+                    categoria,
+                    preco: parseFloat(preco)
+                };
+                
+                const resultadoEdicao = await EventModel.editarEvento(editId, payload);
+                if (resultadoEdicao.sucesso) {
+                    alert('Evento atualizado com sucesso!');
+                    navigate('/home');
+                } else {
+                    alert(resultadoEdicao.mensagem);
+                }
+                setSalvando(false);
+                return;
+            }
+
+            // Modo Criação (Via BFF com upload de Imagem)
+            const formData = new FormData();
             formData.append('titulo', titulo);
             formData.append('descricao', descricao);
             formData.append('data', dataIso8601);
@@ -126,6 +188,7 @@ export default function RegistrarEventoController() {
     // 5. Renderiza a View e injeta os estados e ações
     return (
         <RegistroView 
+            isEdicao={!!editId}
             estados={{
                 titulo, categoria, descricao, data, horaInicio, horaFim, preco,
                 cep, rua, numero, bairro, cidade, uf, previews, salvando, coordenadas

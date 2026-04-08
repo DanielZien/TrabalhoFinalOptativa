@@ -10,7 +10,9 @@ export default function HomeView({
     setTermoPesquisa,
     paginaAtual,
     totalPaginas,
-    setPaginaAtual
+    setPaginaAtual,
+    habilitarModoAdmin,
+    aoDeletarEvento
 }) {
     const navigate = useNavigate();
 
@@ -66,7 +68,18 @@ export default function HomeView({
                         ) : (
                             eventos.map((evento) => (
                                 <div className="col-12 col-md-6 col-lg-4" key={evento.id}>
-                                    <div className="card h-100 shadow-sm border-0 rounded-4 overflow-hidden">
+                                    <div className="card h-100 shadow-sm border-0 rounded-4 overflow-hidden position-relative">
+                                        
+                                        {habilitarModoAdmin && (
+                                            <button 
+                                                className="btn btn-sm btn-danger position-absolute fw-bold shadow" 
+                                                style={{ top: '10px', right: '10px', borderRadius: '20px', zIndex: 10 }}
+                                                onClick={() => aoDeletarEvento(evento.id)}
+                                            >
+                                                Excluir Evento <i className="bi bi-x ms-1"></i>
+                                            </button>
+                                        )}
+
                                         <img
                                             src={evento.imagem}
                                             className="card-img-top"
@@ -86,13 +99,24 @@ export default function HomeView({
                                                     <span className="d-block text-muted small mb-0" style={{ lineHeight: 1 }}>Ingresso</span>
                                                     <strong className="text-dark">{evento.preco}</strong>
                                                 </div>
-                                                <button
-                                                    className="btn px-3 py-1 text-white fw-semibold shadow-sm"
-                                                    style={{ backgroundColor: '#000080', borderRadius: '8px', fontSize: '0.9rem' }}
-                                                    onClick={() => irParaDetalhes(evento)}
-                                                >
-                                                    Mais Detalhes <i className="bi bi-caret-right-fill small"></i>
-                                                </button>
+                                                <div className="d-flex gap-2">
+                                                    {habilitarModoAdmin && (
+                                                        <button
+                                                            className="btn px-3 py-1 text-white fw-semibold shadow-sm"
+                                                            style={{ backgroundColor: '#ffc107', borderRadius: '8px', fontSize: '0.9rem' }}
+                                                            onClick={() => navigate(`/registro?edit=${evento.id}`)}
+                                                        >
+                                                            Editar
+                                                        </button>
+                                                    )}
+                                                    <button
+                                                        className="btn px-3 py-1 text-white fw-semibold shadow-sm"
+                                                        style={{ backgroundColor: '#000080', borderRadius: '8px', fontSize: '0.9rem' }}
+                                                        onClick={() => irParaDetalhes(evento)}
+                                                    >
+                                                        Ver <i className="bi bi-caret-right-fill small"></i>
+                                                    </button>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>

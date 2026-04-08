@@ -148,6 +148,10 @@ export const EventModel = {
                 titulo: eventoAPI.titulo,
                 descricao: eventoAPI.descricao || "Sem descrição disponível.",
                 dataCompleta: `${dataFormatada} às ${horaFormatada}`,
+                dataBruta: eventoAPI.data,
+                horaInicioBruta: eventoAPI.hora_inicio,
+                horaFimBruta: eventoAPI.hora_fim,
+                categoria: eventoAPI.categoria,
                 localizacao: localText,
                 coordenadas: coordenadasArray,
                 preco: precoFormatado,
@@ -186,6 +190,51 @@ export const EventModel = {
         } catch (erro) {
             console.error("Erro no POST:", erro);
             throw erro; 
+        }
+    },
+
+    // Funções Administrativas
+    async excluirEvento(id) {
+        try {
+            const token = localStorage.getItem('token'); 
+            const resposta = await fetch(`${API_BASE}/events/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (!resposta.ok) {
+                throw new Error('Erro ao deletar o evento. Você tem permissão de Admin?');
+            }
+            return { sucesso: true };
+        } catch (erro) {
+            console.error("Erro no DELETE:", erro);
+            return { sucesso: false, mensagem: erro.message };
+        }
+    },
+
+    async editarEvento(id, payload) {
+        try {
+            const token = localStorage.getItem('token'); 
+            const resposta = await fetch(`${API_BASE}/events/${id}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}` 
+                },
+                body: JSON.stringify(payload)
+            });
+
+            if (!resposta.ok) {
+                const erroData = await resposta.json().catch(() => ({}));
+                throw new Error(erroData.message || 'Erro ao editar evento na API');
+            }
+
+            return { sucesso: true };
+        } catch (erro) {
+            console.error("Erro no PATCH:", erro);
+            return { sucesso: false, mensagem: erro.message };
         }
     }
 }

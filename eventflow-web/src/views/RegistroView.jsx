@@ -1,13 +1,13 @@
 import React from 'react';
 import HomeMap from './HomeMap';
 
-export default function RegistroView({ estados, acoes }) {
+export default function RegistroView({ isEdicao, estados, acoes }) {
     return (
         <div className="bg-light pb-5 rounded-4 overflow-hidden">
             <nav className="navbar navbar-light bg-white shadow-sm mb-4">
                 <div className="container">
                     <a className="navbar-brand fw-bold text-dark" href="/home"> Voltar</a>
-                    <span className="navbar-text fw-bold">Criar Novo Evento</span>
+                    <span className="navbar-text fw-bold">{isEdicao ? 'Editar Evento' : 'Criar Novo Evento'}</span>
                 </div>
             </nav>
 
@@ -42,9 +42,9 @@ export default function RegistroView({ estados, acoes }) {
                         <h5 className="mb-3 mt-4 fw-bold">Imagens do Evento</h5>
                         <div className="row g-3 mb-4">
                             <div className="col-12">
-                                <label>Selecione até 4 imagens (A primeira será a capa) *</label>
+                                <label>Selecione até 4 imagens (A primeira será a capa) {isEdicao ? '(Opcional na edição)' : '*'}</label>
                                 <input type="file" className="form-control" accept="image/png, image/jpeg, image/jpg" 
-                                       multiple required onChange={acoes.handleImagens} />
+                                       multiple required={!isEdicao} onChange={acoes.handleImagens} />
                                 
                                 <div className="d-flex gap-2 mt-3 flex-wrap">
                                     {estados.previews.map((src, index) => (
@@ -133,7 +133,7 @@ export default function RegistroView({ estados, acoes }) {
 
                         <button type="submit" className="btn w-100 fw-bold py-2 text-white" 
                                 disabled={estados.salvando} style={{ backgroundColor: '#0b0080', borderRadius: '8px' }}>
-                            {estados.salvando ? 'Salvando (Fazendo upload)...' : 'Salvar Evento'}
+                            {estados.salvando ? 'Salvando...' : (isEdicao ? 'Atualizar Evento' : 'Salvar Evento')}
                         </button>
                     </form>
                 </div>

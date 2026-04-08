@@ -23,9 +23,16 @@ export const AuthModel = {
 
             const dados = await resposta.json();
 
-            //Pegando esse token
+            //Pegando esse token e role
             if (dados.access_toekn) {
                 localStorage.setItem('token', dados.access_toekn);
+                
+                // Salvar Role se vier no objeto de usuário (padrão 'USER' caso não exista)
+                if (dados.user && dados.user.role) {
+                    localStorage.setItem('role', dados.user.role);
+                } else {
+                    localStorage.setItem('role', 'USER');
+                }
                 console.log("Aqui o o token: "+dados.access_toekn);
             }
 
