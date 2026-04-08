@@ -1,8 +1,9 @@
 import React from 'react';
+import HomeMap from './HomeMap';
 
 export default function RegistroView({ estados, acoes }) {
     return (
-        <div className="bg-light min-vh-100">
+        <div className="bg-light pb-5 rounded-4 overflow-hidden">
             <nav className="navbar navbar-light bg-white shadow-sm mb-4">
                 <div className="container">
                     <a className="navbar-brand fw-bold text-dark" href="/home"> Voltar</a>
@@ -111,6 +112,23 @@ export default function RegistroView({ estados, acoes }) {
                                 <input type="text" className="form-control" required 
                                        value={estados.uf} onChange={e => acoes.setUf(e.target.value)} maxLength="2" />
                             </div>
+
+                            {/* Pré-visualização do Mapa baseado no CEP e ViaCEP */}
+                            {estados.coordenadas && (
+                                <div className="col-12 mt-3">
+                                    <label className="text-muted small mb-1">Pré-visualização do Local no Mapa</label>
+                                    <div className="w-100" style={{ height: '300px', borderRadius: '1rem', overflow: 'hidden' }}>
+                                        <HomeMap 
+                                            eventos={[{ 
+                                                id: 'preview', 
+                                                titulo: 'Local do Evento', 
+                                                categoria: 'Aproximado pelo CEP', 
+                                                coordenadas: estados.coordenadas 
+                                            }]} 
+                                        />
+                                    </div>
+                                </div>
+                            )}
                         </div>
 
                         <button type="submit" className="btn w-100 fw-bold py-2 text-white" 

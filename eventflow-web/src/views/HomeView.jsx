@@ -21,29 +21,8 @@ export default function HomeView({
     };
 
     return (
-        <div className="container-fluid bg-white" style={{ minHeight: '100vh' }}>
-            <div className="row">
-
-                {/* Menu Lateral (Sidebar) */}
-                <nav className="col-md-3 col-lg-2 d-none d-md-block border-end p-3" style={{ minHeight: '100vh' }}>
-                    <h4 className="mb-4 text-center mt-2 fw-bold text-dark">EventFlow</h4>
-                    <div className="d-flex flex-column gap-2">
-                        <Link to="/home" className="btn btn-light text-start fw-bold">
-                            <i className="bi bi-house-door me-2"></i> Home
-                        </Link>
-                        <Link to="/registro" className="btn text-start text-dark text-decoration-none">
-                            <i className="bi bi-calendar-event me-2"></i> Novo Evento
-                        </Link>
-                        <Link to="/login" className="btn text-start text-dark text-decoration-none">
-                            <i className="bi bi-box-arrow-in-right me-2"></i> Sair
-                        </Link>
-                    </div>
-                </nav>
-
-                {/* Área Principal */}
-                <main className="col-md-9 col-lg-8 mx-auto p-3 p-md-2">
-
-                    <h5 className="text-center mb-3">
+        <>
+            <h5 className="text-center mb-3">
                         <strong>Explore</strong> <span className="fw-normal text-muted">os Eventos</span>
                     </h5>
 
@@ -171,8 +150,6 @@ export default function HomeView({
                         </div>
                     )}
 
-                </main>
-            </div>
-        </div>
+        </>
     );
 }

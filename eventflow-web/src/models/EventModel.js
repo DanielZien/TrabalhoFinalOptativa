@@ -15,8 +15,8 @@ export const EventModel = {
             const dados = await resposta.json();
             console.log(dados)
 
-            // Mapeia os eventos 
-            const eventosMapeados = dados.events.map(eventoAPI => {
+            // Mapeia os eventos utilizando Promise.all para permitir await interno
+            const eventosMapeados = await Promise.all(dados.events.map(async eventoAPI => {
                 let precoFormatado = "Gratuito";
                 if (eventoAPI.preco && eventoAPI.preco > 0) {
                     precoFormatado = `R$ ${eventoAPI.preco.toFixed(2).replace('.', ',')}`;
@@ -43,6 +43,18 @@ export const EventModel = {
                     if (coords.length >= 2) {
                         coordenadas = [parseFloat(coords[0]), parseFloat(coords[1])];
                     }
+                } else if (localText) {
+                    // Fallback: Busca as coordenadas na API Nominatim caso só haja o texto
+                    try {
+                        const query = `${localText}, Brazil`;
+                        const resGeo = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=1`);
+                        const dataGeo = await resGeo.json();
+                        if (dataGeo && dataGeo.length > 0) {
+                            coordenadas = [parseFloat(dataGeo[0].lat), parseFloat(dataGeo[0].lon)];
+                        }
+                    } catch(e) {
+                        console.error("Erro no Geocoding Fallback", e);
+                    }
                 }
 
                 return {
@@ -52,10 +64,10 @@ export const EventModel = {
                     data: dataFormatada,
                     local: localText,
                     preco: precoFormatado,
-                    imagem: imagemUrl,
-                    coordenadas: coordenadas
-                };
-            });
+                imagem: imagemUrl,
+                coordenadas: coordenadas
+            };
+        }));
 
             // RETORNA AGORA A LISTA E O TOTAL!
             return {
@@ -103,13 +115,20 @@ export const EventModel = {
             const dataFormatada = dataObj.toLocaleDateString('pt-BR');
             const horaFormatada = new Date(eventoAPI.hora_inicio).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
 
-            // Tratando a localização
-            let localText = eventoAPI.localizacao;
-            let latLng = "";
-            if (localText && localText.includes('|')) {
+            let localText = eventoAPI.localizacao || "";
+            let latLngStr = "";
+            if (localText.includes('|')) {
                 const partes = localText.split('|');
                 localText = partes[0].trim();
-                latLng = partes[1].trim(); 
+                latLngStr = partes[1].trim(); 
+            }
+
+            let coordenadasArray = null;
+            if (latLngStr) {
+                const coords = latLngStr.split(',');
+                if (coords.length >= 2) {
+                    coordenadasArray = [parseFloat(coords[0]), parseFloat(coords[1])];
+                }
             }
 
             return {
@@ -118,7 +137,7 @@ export const EventModel = {
                 descricao: eventoAPI.descricao || "Sem descrição disponível.",
                 dataCompleta: `${dataFormatada} às ${horaFormatada}`,
                 localizacao: localText,
-                coordenadas: latLng,
+                coordenadas: coordenadasArray,
                 preco: precoFormatado,
                 organizador: eventoAPI.creator || { nome: "Não informado", email: "-", telefone: "-" },
                 imagem: eventoAPI.imagem 

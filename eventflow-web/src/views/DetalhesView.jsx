@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import HomeMap from './HomeMap';
 
 export default function DetalhesView({ evento, carregando, erro }) {
     // Se estiver carregando, mostra o spinner
@@ -30,7 +31,7 @@ export default function DetalhesView({ evento, carregando, erro }) {
     const urlIframe = `https://maps.google.com/maps?q=${encodeURIComponent(queryMapa)}&t=m&z=15&output=embed`;
 
     return (
-        <div className="bg-light min-vh-100 pb-5">
+        <div className="bg-light pb-5 rounded-4 overflow-hidden">
             <nav className="navbar navbar-light bg-white shadow-sm mb-4">
                 <div className="container">
                     <Link className="navbar-brand fw-bold text-dark d-flex align-items-center" to="/home">
@@ -93,15 +94,7 @@ export default function DetalhesView({ evento, carregando, erro }) {
                     <div className="col-lg-4">
                         <div className="card border-0 shadow-sm rounded-4 position-sticky" style={{ top: '20px' }}>
                             <div className="w-100" style={{ height: '250px', backgroundColor: '#eee', borderTopLeftRadius: '1rem', borderTopRightRadius: '1rem', overflow: 'hidden' }}>
-                                <iframe 
-                                    width="100%" 
-                                    height="100%" 
-                                    frameBorder="0" 
-                                    style={{ border: 0 }} 
-                                    src={urlIframe}
-                                    title="Mapa de Localização"
-                                    allowFullScreen>
-                                </iframe>
+                                <HomeMap eventos={[evento]} />
                             </div>
                             
                             <div className="card-body p-4">

@@ -18,11 +18,18 @@ L.Icon.Default.mergeOptions({
 
 export default function HomeMap({ eventos }) {
     // Coordenadas padrão inicial: Centro do Brasil ou Curitiba
-    const defaultCenter = [-15.7801, -47.9292]; // Brasil
+    let defaultCenter = [-15.7801, -47.9292]; // Brasil
+    let zoomLevel = 4;
 
+    if (eventos && eventos.length === 1 && eventos[0].coordenadas && eventos[0].coordenadas.length === 2) {
+        defaultCenter = eventos[0].coordenadas;
+        zoomLevel = 15;
+    }
+
+    // Usar key faz o mapa recarregar a view apropriadamente
     return (
         <div style={{ height: '100%', width: '100%', minHeight: '300px', borderRadius: '1rem', overflow: 'hidden' }}>
-            <MapContainer center={defaultCenter} zoom={4} style={{ height: '300px', width: '100%' }}>
+            <MapContainer key={`${defaultCenter[0]}-${zoomLevel}`} center={defaultCenter} zoom={zoomLevel} style={{ height: '100%', minHeight: '250px', width: '100%' }}>
                 <TileLayer
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'

@@ -23,6 +23,9 @@ export default function RegistrarEventoController() {
     const [arquivosImagem, setArquivosImagem] = useState([]);
     const [previews, setPreviews] = useState([]);
     const [salvando, setSalvando] = useState(false);
+    
+    // Estado para o Mapa
+    const [coordenadas, setCoordenadas] = useState(null);
 
     const navigate = useNavigate();
 
@@ -40,6 +43,18 @@ export default function RegistrarEventoController() {
                 setBairro(dados.bairro);
                 setCidade(dados.localidade);
                 setUf(dados.uf);
+
+                // Geocode da localização para o mapa
+                try {
+                    const query = `${dados.logradouro}, ${dados.localidade}, ${dados.uf}, Brazil`;
+                    const resGeo = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=1`);
+                    const dataGeo = await resGeo.json();
+                    if (dataGeo && dataGeo.length > 0) {
+                        setCoordenadas([parseFloat(dataGeo[0].lat), parseFloat(dataGeo[0].lon)]);
+                    }
+                } catch(e) {
+                    console.error("Erro no Geocoding:", e);
+                }
             }
         } catch (erro) {
             console.error("Erro no ViaCEP:", erro);
@@ -63,7 +78,12 @@ export default function RegistrarEventoController() {
         try {
             const formData = new FormData();
             const dataIso8601 = new Date(`${data}T${horaInicio}:00`).toISOString();
-            const localizacaoString = `${rua} ${numero}, ${cidade}, ${uf}`;
+            
+            // Formatando endereço e concatenando coordenadas separadas por `|` para que eventModel consuma
+            let localizacaoString = `${rua} ${numero}, ${bairro}, ${cidade}, ${uf}`;
+            if (coordenadas) {
+                localizacaoString += ` | ${coordenadas[0]},${coordenadas[1]}`;
+            }
 
             formData.append('titulo', titulo);
             formData.append('descricao', descricao);
@@ -108,7 +128,7 @@ export default function RegistrarEventoController() {
         <RegistroView 
             estados={{
                 titulo, categoria, descricao, data, horaInicio, horaFim, preco,
-                cep, rua, numero, bairro, cidade, uf, previews, salvando
+                cep, rua, numero, bairro, cidade, uf, previews, salvando, coordenadas
             }}
             acoes={{
                 setTitulo, setCategoria, setDescricao, setData, setHoraInicio, setHoraFim, setPreco,
