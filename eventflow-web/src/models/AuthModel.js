@@ -35,5 +35,33 @@ export const AuthModel = {
             console.error("Erro no login:", erro);
             return { sucesso: false, mensagem: "Erro ao conectar com o servidor."}
         }
+    },
+
+    async fazerCadastro(email, senha, nome, telefone) {
+        try {
+            const resposta = await fetch(API_BASE+"/auth/register", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ 
+                    email: email, 
+                    password: senha,
+                    nome: nome,
+                    telefone: telefone
+                })
+            });
+
+            if (!resposta.ok) {
+                const erroData = await resposta.json().catch(() => ({}));
+                return { sucesso: false, mensagem: erroData.message || "Erro ao registrar o usuário."};
+            }
+
+            return { sucesso: true, mensagem: "Usuário registrado com sucesso!"};
+
+        } catch (erro) {
+            console.error("Erro no registro:", erro);
+            return { sucesso: false, mensagem: "Erro ao conectar com o servidor."}
+        }
     }
 }

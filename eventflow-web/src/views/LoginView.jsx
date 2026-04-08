@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 export default function LoginView({ 
     email, 
@@ -52,7 +53,7 @@ export default function LoginView({
                 </form>
 
                 <div className="text-center mt-3">
-                    <small>Não tem uma conta? <a href="#">Registre-se</a></small>
+                    <small>Não tem uma conta? <Link to="/cadastro" className="text-primary fw-bold text-decoration-none">Registre-se</Link></small>
                 </div>
             </div>
         </div>

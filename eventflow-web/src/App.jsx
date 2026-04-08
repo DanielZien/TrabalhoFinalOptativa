@@ -3,6 +3,7 @@ import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import LoginController from './controllers/LoginController';
 import HomeController from './controllers/HomeController'; // Importamos a Home
+import CadastroUsuarioController from './controllers/CadastroUsuarioController';
 import './index.css'; 
 import RegistrarEventoController  from './controllers/RegistrarEventoController';
 import DetalhesController from './controllers/DetalhesController';
@@ -15,8 +16,9 @@ function App() {
         {/* Se a pessoa acessar localhost:5173 vazio, manda pro /login */}
         <Route path="/" element={<Navigate to="/login" />} />
         
-        {/* Rota do Login */}
+        {/* Rotas de Autenticação */}
         <Route path="/login" element={<LoginController />} />
+        <Route path="/cadastro" element={<CadastroUsuarioController />} />
         
         {/* Rotas Agrupadas no Layout (Para O Sidebar não piscar) */}
         <Route element={<Layout />}>
