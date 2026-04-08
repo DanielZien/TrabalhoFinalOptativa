@@ -16,8 +16,8 @@ export default function HomeView({
 
     // A Solução para o bug do Backend!
     const irParaDetalhes = (evento) => {
-        // Redireciona e leva o objeto evento inteiro na bagagem!
-        navigate(`/detalhes`, { state: { eventoCompleto: evento } });
+        // Passa o ID na URL para o nosso Controller pescar!
+        navigate(`/detalhes?id=${evento.id}`);
     };
 
     return (

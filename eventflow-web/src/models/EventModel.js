@@ -59,34 +59,36 @@ export const EventModel = {
 
      async buscarEventoPorId(id) {
         try {
-            //a rota geral que funciona perfeitamente
-            const resposta = await fetch(`${API_BASE}/events`);
+            // Busca DIRETAMENTE o evento pelo ID na API (muito mais rápido e seguro)
+            const resposta = await fetch(`${API_BASE}/events?id=${id}`);
             
             if (!resposta.ok) {
-                throw new Error('Erro ao buscar a lista de eventos');
+                throw new Error('Erro ao buscar o evento na API');
             }
 
             const dados = await resposta.json();
 
-  
-            const eventoAPI = dados.events.find(evento => evento.id == id);
-
-            if (!eventoAPI) {
-                throw new Error('Evento não encontrado na lista');
+            // Como vimos no Swagger, a API devolve um array "events". 
+            // Se vier vazio, o evento não existe.
+            if (!dados.events || dados.events.length === 0) {
+                throw new Error('Evento não encontrado');
             }
 
-            //Formatação do Preço
+            // Pega o primeiro e único evento desse array
+            const eventoAPI = dados.events[0];
+
+            // Formatação do Preço
             let precoFormatado = "Gratuito";
             if (eventoAPI.preco && eventoAPI.preco > 0) {
                 precoFormatado = `R$ ${eventoAPI.preco.toFixed(2).replace('.', ',')}`;
             }
 
+            // Formatação de Data e Hora
             const dataObj = new Date(eventoAPI.data);
             const dataFormatada = dataObj.toLocaleDateString('pt-BR');
-            
             const horaFormatada = new Date(eventoAPI.hora_inicio).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
 
-            //Tratando a localização
+            // Tratando a localização
             let localText = eventoAPI.localizacao;
             let latLng = "";
             if (localText && localText.includes('|')) {

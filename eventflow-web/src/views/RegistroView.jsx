@@ -5,7 +5,7 @@ export default function RegistroView({ estados, acoes }) {
         <div className="bg-light min-vh-100">
             <nav className="navbar navbar-light bg-white shadow-sm mb-4">
                 <div className="container">
-                    <a className="navbar-brand fw-bold text-dark" href="/"> Voltar</a>
+                    <a className="navbar-brand fw-bold text-dark" href="/home"> Voltar</a>
                     <span className="navbar-text fw-bold">Criar Novo Evento</span>
                 </div>
             </nav>
