@@ -1,6 +1,6 @@
-// src/views/HomeView.jsx
 import React from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import HomeMap from './HomeMap';
 
 export default function HomeView({
     eventos,
@@ -63,11 +63,9 @@ export default function HomeView({
 
                     <hr style={{ borderTop: '2px solid #eee' }} />
 
-                    {/* Banner do Mapa */}
-                    <div className="map-banner mb-2 d-flex justify-content-center align-items-center bg-light rounded-4 shadow-sm py-3 border">
-                        <button className="btn btn-white shadow-sm px-4 py-2 bg-white rounded-pill border fw-semibold">
-                            Explore pelo Mapa <i className="bi bi-geo-alt-fill text-danger ms-1"></i>
-                        </button>
+                    {/* Mapa de Eventos */}
+                    <div className="mb-4 shadow-sm rounded-4 overflow-hidden border">
+                        <HomeMap eventos={eventos} />
                     </div>
 
                     {/* Contadores */}

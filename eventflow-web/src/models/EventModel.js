@@ -29,16 +29,31 @@ export const EventModel = {
                     imagemUrl = "https://images.unsplash.com/photo-1540575467063-178a50c2df87?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80";
                 }
 
-                let localFormatado = eventoAPI.localizacao.split(' | ')[0];
+                let localText = eventoAPI.localizacao || "";
+                let latLngStr = "";
+                if (localText.includes('|')) {
+                    const partes = localText.split('|');
+                    localText = partes[0].trim();
+                    latLngStr = partes[1].trim(); 
+                }
+
+                let coordenadas = null;
+                if (latLngStr) {
+                    const coords = latLngStr.split(',');
+                    if (coords.length >= 2) {
+                        coordenadas = [parseFloat(coords[0]), parseFloat(coords[1])];
+                    }
+                }
 
                 return {
                     id: eventoAPI.id,
                     titulo: eventoAPI.titulo,
                     categoria: eventoAPI.categoria,
                     data: dataFormatada,
-                    local: localFormatado,
+                    local: localText,
                     preco: precoFormatado,
-                    imagem: imagemUrl
+                    imagem: imagemUrl,
+                    coordenadas: coordenadas
                 };
             });
 
