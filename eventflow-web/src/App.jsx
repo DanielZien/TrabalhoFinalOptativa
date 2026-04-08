@@ -4,6 +4,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import LoginController from './controllers/LoginController';
 import HomeController from './controllers/HomeController'; // Importamos a Home
 import './index.css'; 
+import  RegistrarEventoController  from './controllers/RegistrarEventoController';
 
 function App() {
   return (
@@ -17,6 +18,9 @@ function App() {
         
         {/* Rota da Listagem de Eventos */}
         <Route path="/home" element={<HomeController />} />
+
+        {/** Rota para novo Regitro */}
+        <Route path="/registro" element={<RegistrarEventoController/>}></Route>
       </Routes>
     </BrowserRouter>
   )
