@@ -1,8 +1,15 @@
 import React from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, Navigate } from 'react-router-dom';
 import Sidebar from './Sidebar';
 
 export default function Layout() {
+    const token = localStorage.getItem('token');
+
+    // Se o token não existir, o usuário não tem permissão de ver essa página
+    if (!token) {
+        return <Navigate to="/login" replace />;
+    }
+
     return (
         <div className="container-fluid bg-white" style={{ minHeight: '100vh' }}>
             <div className="row">
