@@ -8,7 +8,7 @@ export default function RegistrarEventoController() {
     const [titulo, setTitulo] = useState('');
     const [categoria, setCategoria] = useState('Palestra');
     const [descricao, setDescricao] = useState('');
-    
+
     const [data, setData] = useState('');
     const [horaInicio, setHoraInicio] = useState('');
     const [horaFim, setHoraFim] = useState('');
@@ -24,7 +24,7 @@ export default function RegistrarEventoController() {
     const [arquivosImagem, setArquivosImagem] = useState([]);
     const [previews, setPreviews] = useState([]);
     const [salvando, setSalvando] = useState(false);
-    
+
     // Estado para o Mapa
     const [coordenadas, setCoordenadas] = useState(null);
 
@@ -42,15 +42,15 @@ export default function RegistrarEventoController() {
                     if (ev.categoria) setCategoria(ev.categoria);
                     if (ev.descricao && ev.descricao !== "Sem descrição disponível.") setDescricao(ev.descricao);
                     if (ev.preco && ev.preco !== 'Gratuito') setPreco(ev.preco.replace('R$ ', '').replace(',', '.'));
-                    
+
                     if (ev.dataBruta) {
-                        try { setData(new Date(ev.dataBruta).toISOString().split('T')[0]); } catch(e){}
+                        try { setData(new Date(ev.dataBruta).toISOString().split('T')[0]); } catch (e) { }
                     }
                     if (ev.horaInicioBruta) {
-                        try { setHoraInicio(new Date(ev.horaInicioBruta).toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'})); } catch(e){}
+                        try { setHoraInicio(new Date(ev.horaInicioBruta).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })); } catch (e) { }
                     }
                     if (ev.horaFimBruta) {
-                        try { setHoraFim(new Date(ev.horaFimBruta).toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'})); } catch(e){}
+                        try { setHoraFim(new Date(ev.horaFimBruta).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })); } catch (e) { }
                     }
                     if (ev.localizacao) setRua(ev.localizacao);
                     if (ev.coordenadas) setCoordenadas(ev.coordenadas);
@@ -83,7 +83,7 @@ export default function RegistrarEventoController() {
                     if (dataGeo && dataGeo.length > 0) {
                         setCoordenadas([parseFloat(dataGeo[0].lat), parseFloat(dataGeo[0].lon)]);
                     }
-                } catch(e) {
+                } catch (e) {
                     console.error("Erro no Geocoding:", e);
                 }
             }
@@ -108,7 +108,7 @@ export default function RegistrarEventoController() {
 
         try {
             const dataIso8601 = new Date(`${data}T${horaInicio}:00`).toISOString();
-            
+
             // Formatando endereço completo com coordenadas
             let localizacaoString = '';
             if (cep || numero) {
@@ -121,31 +121,27 @@ export default function RegistrarEventoController() {
                 localizacaoString += ` | ${coordenadas[0]},${coordenadas[1]}`;
             }
 
-            // Modo Edição (PATCH Pura via API NODE)
+            // ==========================================
+            // MODO GAMBIARRA: DELETA ANTES DE RECRIAR
+            // ==========================================
             if (editId) {
-                let payload = {
-                    titulo,
-                    descricao,
-                    data: dataIso8601,
-                    localizacao: localizacaoString,
-                    hora_inicio: new Date(`${data}T${horaInicio}:00`).toISOString(),
-                    hora_fim: new Date(`${data}T${horaFim}:00`).toISOString(),
-                    categoria,
-                    preco: parseFloat(preco)
-                };
-                
-                const resultadoEdicao = await EventModel.editarEvento(editId, payload);
-                if (resultadoEdicao.sucesso) {
-                    alert('Evento atualizado com sucesso!');
-                    navigate('/home');
-                } else {
-                    alert(resultadoEdicao.mensagem);
+                // Aqui estou supondo que você tenha esse método no seu EventModel,
+                // já que na HomeView você passa "aoDeletarEvento" por prop.
+                const resultadoDelete = await EventModel.excluirEvento(editId);
+
+                if (!resultadoDelete.sucesso) {
+                    // Se falhar o delete, aborta a missão para não duplicar!
+                    throw new Error(`Falha ao substituir o evento: ${resultadoDelete.mensagem}`);
                 }
-                setSalvando(false);
-                return;
+
+                // NOTA IMPORTANTE: Nós NÃO colocamos "return" aqui. 
+                // O evento antigo foi de arrasta pra cima, agora o código continua 
+                // descendo para criar o novo usando o FormData abaixo!
             }
 
-            // Modo Criação (Via BFF com upload de Imagem)
+            // ==========================================
+            // MODO CRIAÇÃO (Agora serve para criar E recriar)
+            // ==========================================
             const formData = new FormData();
             formData.append('titulo', titulo);
             formData.append('descricao', descricao);
@@ -172,11 +168,13 @@ export default function RegistrarEventoController() {
 
             if (!resposta.ok) {
                 const erroTxt = await resposta.text();
+                // Se der erro aqui, significa que o evento antigo sumiu e o novo não foi criado.
+                // O usuário ainda está com a tela aberta, então ele pode tentar clicar em salvar de novo.
                 throw new Error(erroTxt);
             }
 
-            alert("Sucesso! Imagens enviadas pro Cloudinary e Evento salvo!");
-            navigate('/home'); // Redireciona usando react-router-dom de forma suave
+            alert(editId ? "Evento editado com sucesso!" : "Sucesso! Imagens enviadas pro Cloudinary e Evento salvo!");
+            navigate('/home');
 
         } catch (erro) {
             alert("Erro ao salvar: " + erro.message);
@@ -184,10 +182,9 @@ export default function RegistrarEventoController() {
             setSalvando(false);
         }
     };
-
     // 5. Renderiza a View e injeta os estados e ações
     return (
-        <RegistroView 
+        <RegistroView
             isEdicao={!!editId}
             estados={{
                 titulo, categoria, descricao, data, horaInicio, horaFim, preco,

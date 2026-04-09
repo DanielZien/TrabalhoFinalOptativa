@@ -30,7 +30,6 @@ public class EventoController {
     @Autowired
     private Cloudinary cloudinary;
 
-    // URL da sua API original (a que foi feita em Node/Prisma)
     private final String API_ORIGINAL_URL = "https://event-flow-vercel.vercel.app/events";
 
     @PostMapping
@@ -43,23 +42,34 @@ public class EventoController {
             @RequestParam("hora_fim") String horaFim,
             @RequestParam("categoria") String categoria,
             @RequestParam("preco") Double preco,
-            @RequestParam("imagens") MultipartFile[] imagens,
-            @RequestHeader(value = "Authorization", required = false) String token) { // Deixamos apenas UM parâmetro!
+            // Tornamos a imagem opcional e adicionamos um parâmetro para a URL antiga
+            @RequestParam(value = "imagens", required = false) MultipartFile[] imagens,
+            @RequestParam(value = "imagem_antiga", required = false) String imagemAntiga, 
+            @RequestHeader(value = "Authorization", required = false) String token) { 
 
         try {
-            List<String> urlsCloudinary = new ArrayList<>();
+            String imagemStringFinal = "";
 
-            // 1. UPLOAD DAS IMAGENS PRO CLOUDINARY
-            for (MultipartFile imagem : imagens) {
-                if (!imagem.isEmpty()) {
-                    Map uploadResult = cloudinary.uploader().upload(imagem.getBytes(), ObjectUtils.emptyMap());
-                    String url = uploadResult.get("secure_url").toString();
-                    urlsCloudinary.add(url);
+            // 1. VERIFICA SE TEM IMAGENS NOVAS PARA UPLOAD
+            if (imagens != null && imagens.length > 0 && !imagens[0].isEmpty()) {
+                List<String> urlsCloudinary = new ArrayList<>();
+                for (MultipartFile imagem : imagens) {
+                    if (!imagem.isEmpty()) {
+                        Map uploadResult = cloudinary.uploader().upload(imagem.getBytes(), ObjectUtils.emptyMap());
+                        String url = uploadResult.get("secure_url").toString();
+                        urlsCloudinary.add(url);
+                    }
                 }
+                imagemStringFinal = String.join("|", urlsCloudinary);
+            } 
+            // 2. SE NÃO TEM IMAGEM NOVA, RESGATA A ANTIGA DA GAMBIARRA
+            else if (imagemAntiga != null && !imagemAntiga.isEmpty()) {
+                imagemStringFinal = imagemAntiga;
+            } else {
+                // Caso extremo: Não mandou nova e nem tinha antiga.
+                // Coloque uma URL de placeholder padrão aqui se quiser!
+                imagemStringFinal = "https://via.placeholder.com/400x200?text=Sem+Imagem";
             }
-
-            // Junta as URLs com "|"
-            String imagemStringFinal = String.join("|", urlsCloudinary);
 
             // 2. MONTA O PAYLOAD PARA A API ORIGINAL
             Map<String, Object> payloadApiOriginal = new HashMap<>();
@@ -71,46 +81,37 @@ public class EventoController {
             payloadApiOriginal.put("hora_fim", horaFim);
             payloadApiOriginal.put("categoria", categoria);
             payloadApiOriginal.put("preco", preco);
-            payloadApiOriginal.put("imagem", imagemStringFinal); // As URLs limpinhas aqui!
+            payloadApiOriginal.put("imagem", imagemStringFinal); 
 
             // 3. FAZ A REQUISIÇÃO PARA A API ORIGINAL
             RestTemplate restTemplate = new RestTemplate();
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
 
-            // --- INÍCIO DA MÁGICA DE DEBUG E FORMATAÇÃO DO TOKEN ---
             System.out.println("==== DEBUG DE AUTENTICAÇÃO ====");
             System.out.println("Token recebido do Front-end: " + token);
             
             if (token != null && !token.isBlank() && !token.equals("undefined")) {
-                // Garante que o token tenha a palavra "Bearer " antes de mandar pro Node
                 if (!token.startsWith("Bearer ")) {
                     headers.set("Authorization", "Bearer " + token);
-                    System.out.println("Token formatado e enviado ao Node: Bearer " + token);
+                    System.out.println("Token formatado e enviado: Bearer " + token);
                 } else {
                     headers.set("Authorization", token);
-                    System.out.println("Token enviado ao Node (já tinha Bearer): " + token);
+                    System.out.println("Token enviado (já tinha Bearer): " + token);
                 }
             } else {
                 System.out.println("ALERTA CRÍTICO: Nenhum token válido chegou do front-end!");
             }
             System.out.println("===============================");
-            // --- FIM DA MÁGICA ---
             
-            // Só repassa o token se ele realmente veio do front-end
-            if (token != null) {
-                headers.set("Authorization", token);
-            }
+            // Removi aquele 'if' redundante que estava estragando o header!
 
             HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(payloadApiOriginal, headers);
-
             ResponseEntity<String> response = restTemplate.postForEntity(API_ORIGINAL_URL, requestEntity, String.class);
 
-            // Retorna o sucesso para o frontend
             return ResponseEntity.status(response.getStatusCode()).body(response.getBody());
 
         } catch (Exception e) {
-            // Se der qualquer erro no Cloudinary ou na API original, cai aqui
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Erro ao processar imagens ou salvar na API: " + e.getMessage());
