@@ -44,7 +44,7 @@ export default function RegistroView({ isEdicao, estados, acoes }) {
                             <div className="col-12">
                                 <label>Selecione até 4 imagens (A primeira será a capa) {isEdicao ? '(Opcional na edição)' : '*'}</label>
                                 <input type="file" className="form-control" accept="image/png, image/jpeg, image/jpg" 
-                                       multiple required={!isEdicao} onChange={acoes.handleImagens} />
+                                       multiple required={!isEdicao && !estados.imagemAntiga} onChange={acoes.handleImagens} />
                                 
                                 <div className="d-flex gap-2 mt-3 flex-wrap">
                                     {estados.previews.map((src, index) => (
@@ -52,6 +52,22 @@ export default function RegistroView({ isEdicao, estados, acoes }) {
                                              style={{ width: '100px', height: '100px', objectFit: 'cover' }} />
                                     ))}
                                 </div>
+                            </div>
+                        </div>
+
+                        {/* NOVA SEÇÃO: MANUAL DO EVENTO */}
+                        <h5 className="mb-3 mt-4 fw-bold">Material de Apoio</h5>
+                        <div className="row g-3 mb-4">
+                            <div className="col-12">
+                                <label>Documento Explicativo / Manual do Evento (PDF, DOC) {isEdicao ? '(Selecione para substituir)' : '(Opcional)'}</label>
+                                <input type="file" className="form-control" accept=".pdf,.doc,.docx" 
+                                       onChange={acoes.handleManual} />
+                                {/* Feedback visual pro usuário saber que o arquivo foi pego */}
+                                {estados.arquivoManual && (
+                                    <small className="text-success mt-1 d-block fw-bold">
+                                        ✓ Arquivo selecionado: {estados.arquivoManual.name}
+                                    </small>
+                                )}
                             </div>
                         </div>
 

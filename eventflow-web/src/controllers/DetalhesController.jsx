@@ -29,6 +29,19 @@ export default function DetalhesController() {
                 if (!dadosEvento) {
                     setErro("Erro ao carregar o evento. Ele pode ter sido excluído.");
                 } else {
+                    // ==========================================
+                    // DESARMANDO O CAVALO DE TROIA DO MANUAL
+                    // ==========================================
+                    if (dadosEvento.descricao && dadosEvento.descricao.includes("||MANUAL||")) {
+                        const partes = dadosEvento.descricao.split("||MANUAL||");
+                        dadosEvento.descricaoExibicao = partes[0].trim(); // Apenas o texto
+                        dadosEvento.linkManual = partes[1].trim();        // Apenas o link
+                    } else {
+                        dadosEvento.descricaoExibicao = dadosEvento.descricao;
+                        dadosEvento.linkManual = null;
+                    }
+                    // ==========================================
+
                     setEvento(dadosEvento);
                 }
             } catch (error) {

@@ -23,6 +23,11 @@ export default function RegistrarEventoController() {
 
     const [arquivosImagem, setArquivosImagem] = useState([]);
     const [previews, setPreviews] = useState([]);
+    
+    // NOVOS ESTADOS: Imagem antiga e Documento Manual
+    const [imagemAntiga, setImagemAntiga] = useState('');
+    const [arquivoManual, setArquivoManual] = useState(null);
+    
     const [salvando, setSalvando] = useState(false);
 
     // Estado para o Mapa
@@ -40,7 +45,16 @@ export default function RegistrarEventoController() {
                 if (ev) {
                     setTitulo(ev.titulo);
                     if (ev.categoria) setCategoria(ev.categoria);
-                    if (ev.descricao && ev.descricao !== "Sem descrição disponível.") setDescricao(ev.descricao);
+                    
+                    // LÓGICA DO CAVALO DE TROIA: Limpando a descrição para o form
+                    if (ev.descricao && ev.descricao !== "Sem descrição disponível.") {
+                        let descLimpa = ev.descricao;
+                        if (descLimpa.includes("||MANUAL||")) {
+                            descLimpa = descLimpa.split("||MANUAL||")[0].trim();
+                        }
+                        setDescricao(descLimpa);
+                    }
+                    
                     if (ev.preco && ev.preco !== 'Gratuito') setPreco(ev.preco.replace('R$ ', '').replace(',', '.'));
 
                     if (ev.dataBruta) {
@@ -54,6 +68,9 @@ export default function RegistrarEventoController() {
                     }
                     if (ev.localizacao) setRua(ev.localizacao);
                     if (ev.coordenadas) setCoordenadas(ev.coordenadas);
+                    
+                    // Salva a imagem atual (se houver) para não perdê-la na edição
+                    if (ev.imagem) setImagemAntiga(ev.imagem);
                 }
             }
             carregar();
@@ -92,13 +109,19 @@ export default function RegistrarEventoController() {
         }
     };
 
-    // 3. Lógica de Processamento de Imagens
+    // 3. Lógica de Processamento de Imagens e Manual
     const handleImagens = (e) => {
         const arquivos = Array.from(e.target.files).slice(0, 4);
         setArquivosImagem(arquivos);
 
         const urlsPreview = arquivos.map(arq => URL.createObjectURL(arq));
         setPreviews(urlsPreview);
+    };
+
+    const handleManual = (e) => {
+        if (e.target.files && e.target.files.length > 0) {
+            setArquivoManual(e.target.files[0]);
+        }
     };
 
     // 4. Lógica de Salvar (Comunicação com o BFF)
@@ -125,18 +148,11 @@ export default function RegistrarEventoController() {
             // MODO GAMBIARRA: DELETA ANTES DE RECRIAR
             // ==========================================
             if (editId) {
-                // Aqui estou supondo que você tenha esse método no seu EventModel,
-                // já que na HomeView você passa "aoDeletarEvento" por prop.
                 const resultadoDelete = await EventModel.excluirEvento(editId);
 
                 if (!resultadoDelete.sucesso) {
-                    // Se falhar o delete, aborta a missão para não duplicar!
                     throw new Error(`Falha ao substituir o evento: ${resultadoDelete.mensagem}`);
                 }
-
-                // NOTA IMPORTANTE: Nós NÃO colocamos "return" aqui. 
-                // O evento antigo foi de arrasta pra cima, agora o código continua 
-                // descendo para criar o novo usando o FormData abaixo!
             }
 
             // ==========================================
@@ -152,9 +168,19 @@ export default function RegistrarEventoController() {
             formData.append('categoria', categoria);
             formData.append('preco', parseFloat(preco));
 
-            arquivosImagem.forEach(arquivo => {
-                formData.append('imagens', arquivo);
-            });
+            // Tratamento das Imagens
+            if (arquivosImagem.length === 0 && imagemAntiga) {
+                formData.append('imagem_antiga', imagemAntiga);
+            } else {
+                arquivosImagem.forEach(arquivo => {
+                    formData.append('imagens', arquivo);
+                });
+            }
+
+            // Tratamento do Manual
+            if (arquivoManual) {
+                formData.append('manual', arquivoManual);
+            }
 
             const token = localStorage.getItem('token') || '';
 
@@ -168,12 +194,10 @@ export default function RegistrarEventoController() {
 
             if (!resposta.ok) {
                 const erroTxt = await resposta.text();
-                // Se der erro aqui, significa que o evento antigo sumiu e o novo não foi criado.
-                // O usuário ainda está com a tela aberta, então ele pode tentar clicar em salvar de novo.
                 throw new Error(erroTxt);
             }
 
-            alert(editId ? "Evento editado com sucesso!" : "Sucesso! Imagens enviadas pro Cloudinary e Evento salvo!");
+            alert(editId ? "Evento editado com sucesso!" : "Sucesso! Evento salvo no sistema!");
             navigate('/home');
 
         } catch (erro) {
@@ -182,18 +206,20 @@ export default function RegistrarEventoController() {
             setSalvando(false);
         }
     };
+
     // 5. Renderiza a View e injeta os estados e ações
     return (
         <RegistroView
             isEdicao={!!editId}
             estados={{
                 titulo, categoria, descricao, data, horaInicio, horaFim, preco,
-                cep, rua, numero, bairro, cidade, uf, previews, salvando, coordenadas
+                cep, rua, numero, bairro, cidade, uf, previews, salvando, coordenadas,
+                imagemAntiga, arquivoManual // Repassando os novos estados
             }}
             acoes={{
                 setTitulo, setCategoria, setDescricao, setData, setHoraInicio, setHoraFim, setPreco,
                 setCep, setRua, setNumero, setBairro, setCidade, setUf,
-                buscarCep, handleImagens, salvarEvento
+                buscarCep, handleImagens, handleManual, salvarEvento // Repassando a nova ação
             }}
         />
     );

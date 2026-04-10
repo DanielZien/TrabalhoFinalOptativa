@@ -42,9 +42,10 @@ public class EventoController {
             @RequestParam("hora_fim") String horaFim,
             @RequestParam("categoria") String categoria,
             @RequestParam("preco") Double preco,
-            // Tornamos a imagem opcional e adicionamos um parâmetro para a URL antiga
             @RequestParam(value = "imagens", required = false) MultipartFile[] imagens,
             @RequestParam(value = "imagem_antiga", required = false) String imagemAntiga, 
+            // NOVO: Parâmetro para receber o arquivo do manual (PDF, DOC, etc)
+            @RequestParam(value = "manual", required = false) MultipartFile manual,
             @RequestHeader(value = "Authorization", required = false) String token) { 
 
         try {
@@ -66,15 +67,28 @@ public class EventoController {
             else if (imagemAntiga != null && !imagemAntiga.isEmpty()) {
                 imagemStringFinal = imagemAntiga;
             } else {
-                // Caso extremo: Não mandou nova e nem tinha antiga.
-                // Coloque uma URL de placeholder padrão aqui se quiser!
                 imagemStringFinal = "https://via.placeholder.com/400x200?text=Sem+Imagem";
             }
 
-            // 2. MONTA O PAYLOAD PARA A API ORIGINAL
+            // --- 3. LÓGICA DO MANUAL (O CAVALO DE TROIA) ---
+            String urlManual = "";
+            if (manual != null && !manual.isEmpty()) {
+                // "resource_type", "auto" é obrigatório para arquivos que não são imagens puras (como PDFs)
+                Map uploadResult = cloudinary.uploader().upload(manual.getBytes(), ObjectUtils.asMap("resource_type", "auto"));
+                urlManual = uploadResult.get("secure_url").toString();
+            }
+
+            // Embutindo a URL secreta na descrição
+            String descricaoFinal = descricao;
+            if (!urlManual.isEmpty()) {
+                descricaoFinal = descricao + " ||MANUAL|| " + urlManual;
+            }
+            // ------------------------------------------------
+
+            // 4. MONTA O PAYLOAD PARA A API ORIGINAL
             Map<String, Object> payloadApiOriginal = new HashMap<>();
             payloadApiOriginal.put("titulo", titulo);
-            payloadApiOriginal.put("descricao", descricao);
+            payloadApiOriginal.put("descricao", descricaoFinal); // <- Mandando a descrição com o brinde embutido!
             payloadApiOriginal.put("data", data);
             payloadApiOriginal.put("localizacao", localizacao);
             payloadApiOriginal.put("hora_inicio", horaInicio);
@@ -83,7 +97,7 @@ public class EventoController {
             payloadApiOriginal.put("preco", preco);
             payloadApiOriginal.put("imagem", imagemStringFinal); 
 
-            // 3. FAZ A REQUISIÇÃO PARA A API ORIGINAL
+            // 5. FAZ A REQUISIÇÃO PARA A API ORIGINAL
             RestTemplate restTemplate = new RestTemplate();
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
@@ -103,8 +117,6 @@ public class EventoController {
                 System.out.println("ALERTA CRÍTICO: Nenhum token válido chegou do front-end!");
             }
             System.out.println("===============================");
-            
-            // Removi aquele 'if' redundante que estava estragando o header!
 
             HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(payloadApiOriginal, headers);
             ResponseEntity<String> response = restTemplate.postForEntity(API_ORIGINAL_URL, requestEntity, String.class);
@@ -114,7 +126,7 @@ public class EventoController {
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Erro ao processar imagens ou salvar na API: " + e.getMessage());
+                    .body("Erro ao processar arquivos ou salvar na API: " + e.getMessage());
         }
     }
 }
