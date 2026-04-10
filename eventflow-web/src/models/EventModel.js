@@ -113,7 +113,7 @@ export const EventModel = {
             // Formatação de Data e Hora
             const dataObj = new Date(eventoAPI.data);
             const dataFormatada = dataObj.toLocaleDateString('pt-BR');
-            const horaFormatada = new Date(eventoAPI.hora_inicio).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+            const horaFormatada = (eventoAPI.hora_inicio);
 
             let localText = eventoAPI.localizacao || "";
             let latLngStr = "";
