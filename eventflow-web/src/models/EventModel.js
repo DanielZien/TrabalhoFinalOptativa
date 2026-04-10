@@ -3,7 +3,7 @@ import { API_BASE } from "../config/api";
 export const EventModel = {
      async buscarEventos(pagina) {
         try {
-            // Adicionamos o ?page= no final da URL
+            // Adicionando o ?page= no final da URL
             const resposta = await fetch(`${API_BASE}/events?page=${pagina}&limit=6`);
             const token = localStorage.getItem('token');
             console.log(token);

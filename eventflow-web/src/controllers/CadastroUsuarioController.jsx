@@ -10,6 +10,7 @@ export default function CadastroUsuarioController() {
     const [senha, setSenha] = useState('');
     const [erro, setErro] = useState('');
     const [carregando, setCarregando] = useState(false);
+    const [confirmarSenha, setConfirmarSenha] = useState('');
 
     const navigate = useNavigate();
 
@@ -27,6 +28,11 @@ export default function CadastroUsuarioController() {
             return;
         }
 
+        if (senha !== confirmarSenha) {
+            setErro("As senhas não coincidem. Tente novamente.");
+            return; // Para a execução e não manda pro back-end
+        }
+
         setCarregando(true);
         const resposta = await AuthModel.fazerCadastro(email, senha, nome, telefone);
         setCarregando(false);
@@ -40,11 +46,13 @@ export default function CadastroUsuarioController() {
     };
 
     return (
-        <CadastroUsuarioView 
+        <CadastroUsuarioView
             nome={nome} setNome={setNome}
             email={email} setEmail={setEmail}
             telefone={telefone} setTelefone={setTelefone}
             senha={senha} setSenha={setSenha}
+            confirmarSenha={confirmarSenha}
+            setConfirmarSenha={setConfirmarSenha}
             erro={erro}
             carregando={carregando}
             aoEnviarFormulario={lidarComSubmit}

@@ -6,10 +6,30 @@ export default function CadastroUsuarioView({
     email, setEmail, 
     telefone, setTelefone,
     senha, setSenha, 
+    confirmarSenha, setConfirmarSenha, // <-- NOVAS PROPS AQUI
     erro, 
     carregando, 
     aoEnviarFormulario 
 }) {
+    
+    // Função para aplicar a máscara de telefone: (XX) XXXXX-XXXX
+    const handleTelefoneChange = (e) => {
+        let valor = e.target.value.replace(/\D/g, ''); // Remove tudo que não for número
+        
+        // Limita a 11 números no máximo
+        valor = valor.substring(0, 11); 
+        
+        // Aplica a formatação dinamicamente
+        if (valor.length > 2) {
+            valor = `(${valor.substring(0, 2)}) ${valor.substring(2)}`;
+        }
+        if (valor.length > 10) {
+            valor = `${valor.substring(0, 10)}-${valor.substring(10)}`;
+        }
+        
+        setTelefone(valor);
+    };
+
     return (
         <div className="container d-flex justify-content-center align-items-center" style={{ minHeight: '100vh' }}>
             <div className="card shadow p-4" style={{ width: '100%', maxWidth: '450px' }}>
@@ -51,11 +71,11 @@ export default function CadastroUsuarioView({
                             id="telefone" 
                             placeholder="(11) 98000-0000"
                             value={telefone}
-                            onChange={(e) => setTelefone(e.target.value)}
+                            onChange={handleTelefoneChange} // <-- MÁSCARA APLICADA AQUI
                         />
                     </div>
 
-                    <div className="mb-4">
+                    <div className="mb-3">
                         <label htmlFor="senha" className="form-label text-muted fw-bold small mb-1">Senha</label>
                         <input 
                             type="password" 
@@ -64,6 +84,19 @@ export default function CadastroUsuarioView({
                             placeholder="******"
                             value={senha}
                             onChange={(e) => setSenha(e.target.value)}
+                        />
+                    </div>
+
+                    {/* NOVO CAMPO: Confirmar Senha */}
+                    <div className="mb-4">
+                        <label htmlFor="confirmarSenha" className="form-label text-muted fw-bold small mb-1">Confirmar Senha</label>
+                        <input 
+                            type="password" 
+                            className="form-control" 
+                            id="confirmarSenha" 
+                            placeholder="******"
+                            value={confirmarSenha}
+                            onChange={(e) => setConfirmarSenha(e.target.value)}
                         />
                     </div>
 

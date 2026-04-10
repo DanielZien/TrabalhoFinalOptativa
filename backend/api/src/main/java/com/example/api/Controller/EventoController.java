@@ -51,7 +51,7 @@ public class EventoController {
         try {
             String imagemStringFinal = "";
 
-            // 1. VERIFICA SE TEM IMAGENS NOVAS PARA UPLOAD
+            // 1. VERIFICA SE TEM IMAGEN
             if (imagens != null && imagens.length > 0 && !imagens[0].isEmpty()) {
                 List<String> urlsCloudinary = new ArrayList<>();
                 for (MultipartFile imagem : imagens) {
@@ -70,7 +70,7 @@ public class EventoController {
                 imagemStringFinal = "https://via.placeholder.com/400x200?text=Sem+Imagem";
             }
 
-            // --- 3. LÓGICA DO MANUAL (O CAVALO DE TROIA) ---
+            // --- 3. LÓGICA DO MANUAL
             String urlManual = "";
             if (manual != null && !manual.isEmpty()) {
                 // "resource_type", "auto" é obrigatório para arquivos que não são imagens puras (como PDFs)
@@ -88,7 +88,7 @@ public class EventoController {
             // 4. MONTA O PAYLOAD PARA A API ORIGINAL
             Map<String, Object> payloadApiOriginal = new HashMap<>();
             payloadApiOriginal.put("titulo", titulo);
-            payloadApiOriginal.put("descricao", descricaoFinal); // <- Mandando a descrição com o brinde embutido!
+            payloadApiOriginal.put("descricao", descricaoFinal); 
             payloadApiOriginal.put("data", data);
             payloadApiOriginal.put("localizacao", localizacao);
             payloadApiOriginal.put("hora_inicio", horaInicio);
