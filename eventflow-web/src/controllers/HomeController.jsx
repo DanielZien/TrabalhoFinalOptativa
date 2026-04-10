@@ -7,9 +7,13 @@ export default function HomeController() {
     const [eventosExibidos, setEventosExibidos] = useState([]);
     const [totalGeral, setTotalGeral] = useState(0);
     const [carregando, setCarregando] = useState(true);
-    const [termoPesquisa, setTermoPesquisa] = useState('');
     
-    // Novos estados de Paginação
+    // Estados de Filtro
+    const [termoPesquisa, setTermoPesquisa] = useState('');
+    const [categoriaSelecionada, setCategoriaSelecionada] = useState('');
+    const [categoriasDisponiveis, setCategoriasDisponiveis] = useState([]);
+    
+    // Estados de Paginação
     const [paginaAtual, setPaginaAtual] = useState(1);
     const [totalPaginas, setTotalPaginas] = useState(1);
 
@@ -17,7 +21,6 @@ export default function HomeController() {
     useEffect(() => {
         async function carregarDados() {
             setCarregando(true);
-            // Passa a página atual para o Model
             const resultado = await EventModel.buscarEventos(paginaAtual);
             
             if (resultado && resultado.lista) {
@@ -25,7 +28,10 @@ export default function HomeController() {
                 setEventosExibidos(resultado.lista);
                 setTotalGeral(resultado.totalGeral);
                 
-                // Salva a página atual e o limite que a API devolveu
+                // Extrai as categorias únicas dos eventos carregados para montar o filtro
+                const categoriasUnicas = [...new Set(resultado.lista.map(ev => ev.categoria).filter(Boolean))];
+                setCategoriasDisponiveis(categoriasUnicas);
+
                 setPaginaAtual(resultado.paginaAtual);
                 setTotalPaginas(resultado.totalPaginas);
             }
@@ -33,18 +39,26 @@ export default function HomeController() {
         }
 
         carregarDados();
-    }, [paginaAtual]); // <-- Toda vez que a página mudar, a API será chamada novamente
+    }, [paginaAtual]); 
 
+    // Efeito unificado: Filtra por texto e por categoria ao mesmo tempo no Front-end!
     useEffect(() => {
-        if (termoPesquisa === '') {
-            setEventosExibidos(eventosObtidos);
-        } else {
-            const filtrados = eventosObtidos.filter(ev => 
+        let filtrados = eventosObtidos;
+
+        // 1. Aplica o filtro de texto (se houver)
+        if (termoPesquisa !== '') {
+            filtrados = filtrados.filter(ev => 
                 ev.titulo.toLowerCase().includes(termoPesquisa.toLowerCase()) 
             );
-            setEventosExibidos(filtrados);
         }
-    }, [termoPesquisa, eventosObtidos]);
+
+        // 2. Aplica o filtro de categoria (se houver)
+        if (categoriaSelecionada !== '') {
+            filtrados = filtrados.filter(ev => ev.categoria === categoriaSelecionada);
+        }
+
+        setEventosExibidos(filtrados);
+    }, [termoPesquisa, categoriaSelecionada, eventosObtidos]);
 
     const habilitarModoAdmin = localStorage.getItem('role')?.toUpperCase() === 'ADMIN';
 
@@ -67,12 +81,16 @@ export default function HomeController() {
             carregando={carregando} 
             termoPesquisa={termoPesquisa}
             setTermoPesquisa={setTermoPesquisa}
-            // Passamos as propriedades de paginação para a View
+            
+            // Novas propriedades do filtro de categoria
+            categoriaSelecionada={categoriaSelecionada}
+            setCategoriaSelecionada={setCategoriaSelecionada}
+            categoriasDisponiveis={categoriasDisponiveis}
+
             paginaAtual={paginaAtual}
             totalPaginas={totalPaginas}
             setPaginaAtual={setPaginaAtual}
             
-            // Passamos privilégios e funções Admin
             habilitarModoAdmin={habilitarModoAdmin}
             aoDeletarEvento={aoDeletarEvento}
         />
