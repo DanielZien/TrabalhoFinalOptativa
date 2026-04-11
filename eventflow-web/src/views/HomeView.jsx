@@ -122,7 +122,7 @@ export default function HomeView({
                                                 <button
                                                     className="btn px-3 py-1 text-white fw-semibold shadow-sm"
                                                     style={{ backgroundColor: '#ffc107', borderRadius: '8px', fontSize: '0.9rem' }}
-                                                    onClick={() => navigate(`/registro?edit=${evento.id}`)}
+                                                    onClick={() => navigate(`/editar?edit=${evento.id}`)}
                                                 >
                                                     Editar
                                                 </button>

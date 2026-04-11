@@ -5,9 +5,11 @@ import LoginController from './controllers/LoginController';
 import HomeController from './controllers/HomeController'; // Importamos a Home
 import CadastroUsuarioController from './controllers/CadastroUsuarioController';
 import './index.css'; 
-import RegistrarEventoController  from './controllers/RegistrarEventoController';
+
 import DetalhesController from './controllers/DetalhesController';
 import Layout from './views/Layout';
+import CriarEventoController from './controllers/CriarEventoController';
+import EditarEventoController from './controllers/EditarEventoController';
 
 function App() {
   return (
@@ -26,7 +28,10 @@ function App() {
           <Route path="/home" element={<HomeController />} />
 
           {/** Rota para novo Regitro */}
-          <Route path="/registro" element={<RegistrarEventoController />} />
+          <Route path="/registro" element={<CriarEventoController />} />
+
+          {/* Criando a rota para edicao */}
+          <Route path="/editar" element={<EditarEventoController/>}></Route>
 
           {/** Agora a rota de detalhes */}
           <Route path='/detalhes' element={<DetalhesController />} />

@@ -63,7 +63,7 @@ public class EventoController {
                 }
                 imagemStringFinal = String.join("|", urlsCloudinary);
             } 
-            // 2. SE NÃO TEM IMAGEM NOVA, RESGATA A ANTIGA DA GAMBIARRA
+            // 2. SE NÃO TEM IMAGEM
             else if (imagemAntiga != null && !imagemAntiga.isEmpty()) {
                 imagemStringFinal = imagemAntiga;
             } else {
@@ -83,9 +83,7 @@ public class EventoController {
             if (!urlManual.isEmpty()) {
                 descricaoFinal = descricao + " ||MANUAL|| " + urlManual;
             }
-            // ------------------------------------------------
 
-            // 4. MONTA O PAYLOAD PARA A API ORIGINAL
             Map<String, Object> payloadApiOriginal = new HashMap<>();
             payloadApiOriginal.put("titulo", titulo);
             payloadApiOriginal.put("descricao", descricaoFinal); 
@@ -97,7 +95,7 @@ public class EventoController {
             payloadApiOriginal.put("preco", preco);
             payloadApiOriginal.put("imagem", imagemStringFinal); 
 
-            // 5. FAZ A REQUISIÇÃO PARA A API ORIGINAL
+            //FAZ A REQUISIÇÃO PARA A API ORIGINAL
             RestTemplate restTemplate = new RestTemplate();
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
