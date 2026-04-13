@@ -55,7 +55,7 @@ export default function CriarEventoController() {
                 throw new Error(erroTxt);
             }
 
-            alert("Sucesso! Evento salvo no sistema!");
+            // alert("Sucesso! Evento salvo no sistema!");
             navigate('/home');
 
         } catch (erro) {

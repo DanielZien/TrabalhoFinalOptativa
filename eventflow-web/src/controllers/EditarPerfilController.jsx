@@ -77,7 +77,7 @@ export default function EditarPerfilController() {
             });
 
             if (resposta.ok) {
-                alert(`Perfil atualizado com sucesso!`);
+                // alert(`Perfil atualizado com sucesso!`);
                 navigate('/home');
             } else {
                 setErro("Erro ao atualizar o perfil. Verifique os dados.");

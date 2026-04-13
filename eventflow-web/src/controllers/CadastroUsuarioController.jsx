@@ -62,7 +62,7 @@ export default function CadastroUsuarioController() {
             });
 
             if (resposta.ok) {
-                alert(`Sua conta foi criada com sucesso! Faça login para continuar.`);
+                // alert(`Sua conta foi criada com sucesso! Faça login para continuar.`);
                 navigate('/login');
             } else {
                 const erroTxt = await resposta.text();

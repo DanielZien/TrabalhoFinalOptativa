@@ -136,7 +136,7 @@ export default function EditarEventoController() {
                 throw new Error(erroTxt);
             }
 
-            alert("Evento editado com sucesso!");
+            // alert("Evento editado com sucesso!");
             navigate('/home');
 
         } catch (erro) {

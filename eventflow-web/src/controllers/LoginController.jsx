@@ -34,7 +34,7 @@ export default function LoginController() {
         setCarregando(false);
 
         if (resposta.sucesso) {
-            alert(`Bem-vindo, ${resposta.usuario}! Login efetuado com sucesso.`);
+            // alert(`Bem-vindo, ${resposta.usuario}! Login efetuado com sucesso.`);
             
             //Redirecionamento 
             navigate('/home');

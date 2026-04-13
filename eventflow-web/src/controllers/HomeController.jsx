@@ -66,7 +66,7 @@ export default function HomeController() {
         if (window.confirm("Você tem certeza que deseja excluir esse evento permanentemente?")) {
             const resposta = await EventModel.excluirEvento(id);
             if (resposta.sucesso) {
-                alert("Evento excluído com sucesso!");
+                // alert("Evento excluído com sucesso!");
                 setEventosObtidos(prev => prev.filter(e => e.id !== id));
             } else {
                 alert(resposta.mensagem);
