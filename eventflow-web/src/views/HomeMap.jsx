@@ -29,7 +29,7 @@ export default function HomeMap({ eventos }) {
     // Usar key faz o mapa recarregar a view apropriadamente
     return (
         <div style={{ height: '100%', width: '100%', minHeight: '300px', borderRadius: '1rem', overflow: 'hidden' }}>
-            <MapContainer key={`${defaultCenter[0]}-${zoomLevel}`} center={defaultCenter} zoom={zoomLevel} style={{ height: '100%', minHeight: '250px', width: '100%' }}>
+            <MapContainer key={`${defaultCenter[0]}-${zoomLevel}`} center={defaultCenter} zoom={zoomLevel} style={{ height: '100%', minHeight: '300px', width: '100%' }}>
                 <TileLayer
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
