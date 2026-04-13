@@ -4,12 +4,15 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import LoginController from './controllers/LoginController';
 import HomeController from './controllers/HomeController'; // Importamos a Home
 import CadastroUsuarioController from './controllers/CadastroUsuarioController';
-import './index.css'; 
+import './index.css';
 
 import DetalhesController from './controllers/DetalhesController';
 import Layout from './views/Layout';
 import CriarEventoController from './controllers/CriarEventoController';
 import EditarEventoController from './controllers/EditarEventoController';
+
+import VerPerfilController from './controllers/VerPerfilController';
+import EditarPerfilController from './controllers/EditarPerfilController';
 
 function App() {
   return (
@@ -17,11 +20,11 @@ function App() {
       <Routes>
         {/* Se a pessoa acessar localhost:5173 vazio, manda pro /login */}
         <Route path="/" element={<Navigate to="/login" />} />
-        
+
         {/* Rotas de Autenticação */}
         <Route path="/login" element={<LoginController />} />
         <Route path="/cadastro" element={<CadastroUsuarioController />} />
-        
+
         {/* Rotas Agrupadas no Layout (Para O Sidebar não piscar) */}
         <Route element={<Layout />}>
           {/* Rota da Listagem de Eventos */}
@@ -31,10 +34,14 @@ function App() {
           <Route path="/registro" element={<CriarEventoController />} />
 
           {/* Criando a rota para edicao */}
-          <Route path="/editar" element={<EditarEventoController/>}></Route>
+          <Route path="/editar" element={<EditarEventoController />}></Route>
 
           {/** Agora a rota de detalhes */}
           <Route path='/detalhes' element={<DetalhesController />} />
+
+          <Route path="/perfil" element={<VerPerfilController />} />
+
+          <Route path="/editar-perfil" element={<EditarPerfilController />} />
         </Route>
       </Routes>
     </BrowserRouter>

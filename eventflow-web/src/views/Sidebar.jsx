@@ -77,7 +77,6 @@ export default function Sidebar() {
                         </div>
                     )}
                     
-                    {/* text-truncate evita que emails muito longos quebrem o layout */}
                     <div style={{ overflow: 'hidden' }}>
                         <p className="mb-0 fw-bold text-truncate" style={{ fontSize: '0.95rem' }}>
                             {usuario.nome}
@@ -85,6 +84,25 @@ export default function Sidebar() {
                         <p className="mb-0 text-muted text-truncate" style={{ fontSize: '0.8rem' }}>
                             {usuario.email}
                         </p>
+                    </div>
+
+                    {/* --- NOVO: Botão de 3 pontinhos e Menu Dropdown --- */}
+                    <div className="dropdown ms-auto"> {/* ms-auto empurra pro canto direito */}
+                        <button className="btn btn-sm btn-light border-0 rounded-circle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i className="bi bi-three-dots-vertical"></i>
+                        </button>
+                        <ul className="dropdown-menu dropdown-menu-end shadow border-0">
+                            <li>
+                                <Link className="dropdown-item d-flex align-items-center gap-2" to="/perfil">
+                                    <i className="bi bi-person text-primary"></i> Ver Perfil
+                                </Link>
+                            </li>
+                            <li>
+                                <Link className="dropdown-item d-flex align-items-center gap-2" to="/editar-perfil">
+                                    <i className="bi bi-pencil text-warning"></i> Editar Conta
+                                </Link>
+                            </li>
+                        </ul>
                     </div>
                 </div>
             )}
